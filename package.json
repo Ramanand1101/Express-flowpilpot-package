@@ -1,0 +1,13 @@
+{
+  "name": "node-red-plugin-template",
+  "version": "1.0.0",
+  "description": "An example plugin that adds a new sidebar to the editor",
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "node-red": {
+      "plugins": {
+          "sidebar-plugin": "sidebar-plugin.html"
+      }
+  }
+}
