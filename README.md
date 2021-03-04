@@ -1,0 +1,1 @@
+Example Node-RED that adds a sidebar panel in the editor
