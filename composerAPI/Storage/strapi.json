@@ -1,0 +1,50 @@
+[
+    {
+        "id": "67890",
+        "type": "tab",
+        "label": "Strapi Flow"
+    },
+    {
+        "id": "n4", 
+        "type": "inject", 
+        "z": "67890", 
+        "name": "Start Strapi", 
+        "topic": "", 
+        "payload": "", 
+        "payloadType": "date", 
+        "repeat": "", 
+        "crontab": "", 
+        "once": true, 
+        "onceDelay": 0.1, 
+        "x": 150, 
+        "y": 100, 
+        "wires": [["n5"]]
+    },
+    {
+        "id": "n5", 
+        "type": "function", 
+        "z": "67890", 
+        "name": "Generate Random Picture URL", 
+        "func": "var picURLs = [\n    'https://picsum.photos/200/300',\n    'https://picsum.photos/300/400',\n    'https://picsum.photos/400/500',\n];\nmsg.payload = picURLs[Math.floor(Math.random() * picURLs.length)];\nreturn msg;", 
+        "outputs": 1, 
+        "noerr": 0, 
+        "x": 350, 
+        "y": 100, 
+        "wires": [["n6"]]
+    },
+    {
+        "id": "n6", 
+        "type": "debug", 
+        "z": "67890", 
+        "name": "Debug Strapi", 
+        "active": true, 
+        "tosidebar": true, 
+        "console": false, 
+        "tostatus": false, 
+        "complete": "false", 
+        "targetType": "msg", 
+        "x": 550, 
+        "y": 100, 
+        "wires": []
+    }
+]

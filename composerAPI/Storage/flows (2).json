@@ -1,0 +1,3606 @@
+[
+    {
+        "id": "dbfdd28e.d60f",
+        "type": "tab",
+        "label": "E-commerce full api",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "b0d910b9bed9c41e",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 550,
+        "y": 140,
+        "wires": [
+            [
+                "51a980b4cd2f4079"
+            ]
+        ]
+    },
+    {
+        "id": "ad2dc6e0b0f69fea",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function",
+        "func": "let username=msg.req.body.username\nlet password=msg.req.body.password\nmsg.url=env.get(\"vender\")\nconst payload={\n    query:`\n        mutation($username: String!, $password: String!) {\n            login(username: $username, password: $password) {\n                ... on CurrentUser {\n                        id\n                        identifier\n                }\n                ... on InvalidCredentialsError {\n                        errorCode\n                        message\n                        authenticationError\n                    }\n                ... on NotVerifiedError {\n                        errorCode\n                        message\n                    }\n                ... on NativeAuthStrategyError {\n                        errorCode\n                        message\n                    }\n            }\n        }`,\n        \n        variables: {\n            username: username,\n            password:password\n        }\n        \n}\n\nmsg.payload=payload\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 374,
+        "y": 138.28570556640625,
+        "wires": [
+            [
+                "b0d910b9bed9c41e"
+            ]
+        ]
+    },
+    {
+        "id": "0432112571175391",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "customar/login",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 140,
+        "wires": [
+            [
+                "ad2dc6e0b0f69fea"
+            ]
+        ]
+    },
+    {
+        "id": "51a980b4cd2f4079",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 710,
+        "y": 140,
+        "wires": [
+            [
+                "63ae9468cb9c9361"
+            ],
+            [
+                "e3e160feb0571491"
+            ]
+        ]
+    },
+    {
+        "id": "a01d1426a11d5b39",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 201",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1130,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "63ae9468cb9c9361",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 143",
+        "func": "let data=msg.payload.data.login\nif(msg.payload.data.login.id){\n    msg.payload={\n        message:\"Login Sucessfully\",\n        msg:`${msg.payload.data.login.identifier} User Login Sucessfully`,\n        token: msg.headers[\"vendure-auth-token\"]\n    }\n    msg.statusCode=200\n}else{\n    msg.payload={\n        msg:\"Login Failed\",\n        message: msg.payload.data.login.message,\n        errorCode: msg.payload.data.login.errorCode,\n    }\n    msg.statusCode=400\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 100,
+        "wires": [
+            [
+                "a01d1426a11d5b39",
+                "50ee74b394b02eff"
+            ]
+        ]
+    },
+    {
+        "id": "763a166302efabe3",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/carts",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 144,
+        "y": 518.2857055664062,
+        "wires": [
+            [
+                "1c7b19fa0f8d9dd2"
+            ]
+        ]
+    },
+    {
+        "id": "1c7b19fa0f8d9dd2",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 144",
+        "func": "// Check if the authorization token is present\nconst token = msg.req.headers.authorization\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`,\n    \n};\nmsg.url=env.get(\"vender\")\nconst payload={\n    query:`query ActiveOrder {\n    activeOrder {\n        id\n        type\n        orderPlacedAt\n        code\n        state\n        active\n        couponCodes\n        totalQuantity\n        subTotal\n        subTotalWithTax\n        currencyCode\n        shipping\n        shippingWithTax\n        total\n        totalWithTax\n        customFields\n        shippingAddress {\n            fullName\n            company\n            streetLine1\n            streetLine2\n            city\n            province\n            postalCode\n            country\n            countryCode\n            phoneNumber\n            customFields\n        }\n        billingAddress {\n            fullName\n            company\n            streetLine1\n            streetLine2\n            city\n            province\n            postalCode\n            country\n            countryCode\n            phoneNumber\n            customFields\n        }\n        lines {\n            id\n            productVariant {\n                id\n                productId\n                name\n                price\n            }\n        }\n    }\n}\n\n`\n}\nif(token){\n\n    msg.payload=payload\n    msg.statusCode=200\n}else{\n    msg.payload.alert=\"Pass token inside Headers\"\n    msg.statusCode=400\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 520,
+        "wires": [
+            [
+                "ad9c0d67d28adb65"
+            ]
+        ]
+    },
+    {
+        "id": "ad9c0d67d28adb65",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 590,
+        "y": 520,
+        "wires": [
+            [
+                "f924166b4e96502a"
+            ]
+        ]
+    },
+    {
+        "id": "f924166b4e96502a",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 730,
+        "y": 520,
+        "wires": [
+            [
+                "83f81149532ff816"
+            ],
+            [
+                "be4cd02ded75ccc0"
+            ]
+        ]
+    },
+    {
+        "id": "3cd32039df59dac8",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/cart/addtocart",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 184,
+        "y": 978.2857055664062,
+        "wires": [
+            [
+                "cb4927ac463291f0"
+            ]
+        ]
+    },
+    {
+        "id": "cb4927ac463291f0",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 146",
+        "func": "const productVariantId = msg.req.body.productVariantId\nconst quantity = msg.req.body.quantity\nconst token = msg.req.headers.authorization\n\nmsg.url=env.get(\"vender\")\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`,\n    \n};\n\nconst payload={\n  query:`\n    mutation($productVariantId:ID!,$quantity:Int!){\n      addItemToOrder(\n        productVariantId:$productVariantId\n        quantity:$quantity\n      ){\n        ...on Order{\n          id\n          type\n          customFields\n        }\n        ...on OrderModificationError{\n          errorCode\n          message\n        }\n        ...on OrderLimitError{\n          errorCode\n          maxItems\n          message\n        }\n        ...on NegativeQuantityError{\n          errorCode\n          message\n        }\n        ...on InsufficientStockError{\n          errorCode\n          message\n          quantityAvailable\n          \n        }\n      }\n  }`,\n  variables: {\n    productVariantId: productVariantId,\n    quantity: quantity\n  }\n        \n}\n\n\nif(!token){\n    msg.message=\"Pass token inside Headers\"\n    msg.statusCode=400\n  \n}if(token){\n  msg.payload=payload\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 444,
+        "y": 978.2857055664062,
+        "wires": [
+            [
+                "7384e36a5699917d"
+            ]
+        ]
+    },
+    {
+        "id": "7384e36a5699917d",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 610,
+        "y": 980,
+        "wires": [
+            [
+                "af221a90bf64d39e"
+            ]
+        ]
+    },
+    {
+        "id": "af221a90bf64d39e",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 750,
+        "y": 980,
+        "wires": [
+            [
+                "d36fd811c60ec3c7"
+            ],
+            [
+                "fb4fe78cf99c446d"
+            ]
+        ]
+    },
+    {
+        "id": "5b35552ff2d5d020",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 203",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1150,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "87df64168b014c36",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1130,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "bad8fe70738d782d",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/cart/updatecart",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 194,
+        "y": 1158.2857055664062,
+        "wires": [
+            [
+                "0e23eafce43f59a1"
+            ]
+        ]
+    },
+    {
+        "id": "0e23eafce43f59a1",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 147",
+        "func": "const orderLineId = msg.req.body.orderLineId\nconst quantity = msg.req.body.quantity\nconst token = msg.req.headers.authorization\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`,\n    \n};\n\nmsg.url=env.get(\"vender\")\n\nconst payload={\n  query:`\n    mutation(\n    $orderLineId:ID!,\n    $quantity:Int!\n  ){\n    adjustOrderLine(\n      orderLineId:$orderLineId\n      quantity:$quantity\n    ){\n      ...on Order{\n        id\n        customer{\n          id\n          emailAddress\n        }\n      }\n      ...on OrderLimitError{\n        errorCode\n        message\n        maxItems\n      }\n      ...on OrderModificationError{\n        errorCode\n        message\n        \n      }\n      ...on NegativeQuantityError{\n        errorCode\n        message\n      }\n      ...on InsufficientStockError{\n        errorCode\n        message\n        quantityAvailable\n        order{\n          id\n          total\n        }\n      }\n    }\n  }`,\n  variables: {\n    orderLineId: orderLineId,\n    quantity: quantity\n  }\n        \n}\n\n\nif (!token) {\n  msg.message = \"Pass token inside Headers\"\n  msg.statusCode = 400\n\n\n} if(token) {\n  msg.payload = payload\n  msg.statusCode = 200\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 464,
+        "y": 1158.2857055664062,
+        "wires": [
+            [
+                "0b6085b0f317fa90"
+            ]
+        ]
+    },
+    {
+        "id": "0b6085b0f317fa90",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 1160,
+        "wires": [
+            [
+                "c6ab37f0c1edd887"
+            ]
+        ]
+    },
+    {
+        "id": "c6ab37f0c1edd887",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 770,
+        "y": 1160,
+        "wires": [
+            [
+                "8169f12f83b67702"
+            ],
+            [
+                "d4f818c67af40f7d"
+            ]
+        ]
+    },
+    {
+        "id": "8276d8e56d39c21e",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/cart/deletecart",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 200,
+        "y": 1340,
+        "wires": [
+            [
+                "97ea7dfe8ff24c66"
+            ]
+        ]
+    },
+    {
+        "id": "97ea7dfe8ff24c66",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 148",
+        "func": "const orderLineId = msg.req.body.orderLineId\nconst token = msg.req.headers.authorization\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`,\n    \n};\n\nmsg.url=env.get(\"vender\")\n\nconst payload={\n  query:`\n    mutation($orderLineId: ID!) {\n      removeOrderLine(orderLineId: $orderLineId) {\n        ... on Order {\n          id\n          active\n        }\n        ... on OrderModificationError {\n          errorCode\n          message\n        }\n      }\n  }`,\n  variables: {\n    orderLineId: orderLineId,\n  }   \n}\n\nif (!token) {\n  msg.message = \"Pass token inside Headers\"\n  msg.statusCode = 400\n\n\n} if(token) {\n  msg.payload = payload\n  msg.statusCode = 200\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 1340,
+        "wires": [
+            [
+                "5fdede9fe502ccaf"
+            ]
+        ]
+    },
+    {
+        "id": "5fdede9fe502ccaf",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 1340,
+        "wires": [
+            [
+                "210d61a1c75b24e9"
+            ]
+        ]
+    },
+    {
+        "id": "210d61a1c75b24e9",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 770,
+        "y": 1340,
+        "wires": [
+            [
+                "519884ac51a38e28"
+            ],
+            [
+                "46162b842fec5b4c"
+            ]
+        ]
+    },
+    {
+        "id": "62cd8e3cc8b20c41",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "REMOVE CART",
+        "info": "",
+        "x": 160,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "f00eb896fbf95c8e",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "USER LOGIN",
+        "info": "",
+        "x": 130,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "befee30d091573c0",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "ACTIVE CART",
+        "info": "",
+        "x": 140,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "b50ed5f6043aa28f",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "ADD ITEM TO THE CART",
+        "info": "",
+        "x": 190,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "16c70275282847b6",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "UPDATE CART ",
+        "info": "",
+        "x": 160,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "e3e160feb0571491",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 157",
+        "func": "if(msg.payload.errors[0].message){\n  msg.payload = {\n    msg:\"Login Failed\",\n    message: msg.payload.errors[0].message\n  };\n  msg.statusCode=400\n}\n\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 890,
+        "y": 160,
+        "wires": [
+            [
+                "a01d1426a11d5b39",
+                "50ee74b394b02eff"
+            ]
+        ]
+    },
+    {
+        "id": "50ee74b394b02eff",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "Status Code",
+        "statusCode": "",
+        "headers": {},
+        "x": 1130,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "26b00ac2ff5dac26",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 216",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1150,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "ee4be5dc89c2d6f5",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "Status Code",
+        "statusCode": "",
+        "headers": {},
+        "x": 1150,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "83f81149532ff816",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 158",
+        "func": "let data=msg.payload.data.activeorder\nif(msg.payload.data.activeOrder){\n    \n    msg.payload.message= \"User Cart Data Successfully Get\",\n    \n    msg.statusCode=200\n    \n}\nif (msg.payload.data.activeOrder == null) {\n\n    msg.payload.message = \"YOU HAVE NOT ADDED ANY PRODUCT IN YOUR CART\"\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 480,
+        "wires": [
+            [
+                "26b00ac2ff5dac26",
+                "ee4be5dc89c2d6f5"
+            ]
+        ]
+    },
+    {
+        "id": "be4cd02ded75ccc0",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 159",
+        "func": "if (msg.payload.errors[0].message) {\n    msg.payload = {\n        msg: \"Failed to get the User Cart Data and need to pass the Token\",\n        message: msg.payload.errors[0].message\n    };\n    msg.statusCode=400   \n}\n\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 540,
+        "wires": [
+            [
+                "ee4be5dc89c2d6f5",
+                "26b00ac2ff5dac26"
+            ]
+        ]
+    },
+    {
+        "id": "d36fd811c60ec3c7",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 161",
+        "func": "if(msg.payload.errors[0].message){\n  msg.payload = {\n    \n    message: msg.payload.errors[0].message\n  };\n  msg.statusCode=400\n}\nif (msg.message == \"Pass token inside Headers\"){\n  msg.payload={\n    msg:\"Pass The Token Inside the Headers\"\n  }\n  msg.statusCode=400\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 940,
+        "wires": [
+            [
+                "87df64168b014c36",
+                "5b35552ff2d5d020"
+            ]
+        ]
+    },
+    {
+        "id": "fb4fe78cf99c446d",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 162",
+        "func": "\n if (msg.payload.data.addItemToOrder.errorCode){\n\n    msg.payload.msg= \"Failed to Data added to card\",\n\n    msg.statusCode = 400\n}if(msg.payload.data.addItemToOrder.id){\n    msg.payload={\n        message : \"Successfully Data Addeded to The Cart\",\n    }\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 1000,
+        "wires": [
+            [
+                "87df64168b014c36",
+                "5b35552ff2d5d020"
+            ]
+        ]
+    },
+    {
+        "id": "d28ce62faec8861d",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 218",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1170,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "0efa2ec20b5e9148",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "Status Code",
+        "statusCode": "",
+        "headers": {},
+        "x": 1170,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "8169f12f83b67702",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 163",
+        "func": "\nif (msg.message == \"Pass token inside Headers\") {\n    msg.payload = {\n        msg: \"Pass The Token Inside the Headers\"\n    }\n    msg.statusCode = 400\n}\nif (msg.payload.errors){\n    msg.payload={\n        message: msg.payload.errors[0].message\n    }\n    msg.statusCode = 400\n}\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 950,
+        "y": 1140,
+        "wires": [
+            [
+                "0efa2ec20b5e9148",
+                "d28ce62faec8861d"
+            ]
+        ]
+    },
+    {
+        "id": "d4f818c67af40f7d",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 164",
+        "func": "\n if (msg.payload.data.adjustOrderLine.errorCode){\n    \n    msg.payload.msg=\"Failed to Update The card Data\"\n    msg.statusCode=400\n} if (msg.payload.data.adjustOrderLine.id){\n    msg.payload={\n        message : \"Successfully Data updated to The Cart\",\n    }\n    \n\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 950,
+        "y": 1200,
+        "wires": [
+            [
+                "0efa2ec20b5e9148",
+                "d28ce62faec8861d"
+            ]
+        ]
+    },
+    {
+        "id": "b5b8fac8979e9111",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 221",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1184,
+        "y": 1378.2857055664062,
+        "wires": []
+    },
+    {
+        "id": "7982dc424a0db32f",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "Status Code",
+        "statusCode": "",
+        "headers": {},
+        "x": 1184,
+        "y": 1318.2857055664062,
+        "wires": []
+    },
+    {
+        "id": "519884ac51a38e28",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 165",
+        "func": "\nif (msg.message == \"Pass token inside Headers\") {\n    msg.payload = {\n        msg: \"Pass The Token Inside the Headers\"\n    }\n    msg.statusCode = 400\n}\nif (msg.payload.errors){\n    msg.payload={\n        message: msg.payload.errors[0].message\n    }\n    msg.statusCode = 400\n}\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 964,
+        "y": 1318.2857055664062,
+        "wires": [
+            [
+                "7982dc424a0db32f",
+                "b5b8fac8979e9111"
+            ]
+        ]
+    },
+    {
+        "id": "46162b842fec5b4c",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 166",
+        "func": "\n if (msg.payload.data.removeOrderLine.errorCode){\n    \n    msg.payload.msg=\"Failed to remove The card Data\"\n    msg.statusCode=400\n} if (msg.payload.data.removeOrderLine.id){\n    msg.payload={\n        message : \"Successfully remove data to The Cart\",\n    }\n    \n\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 964,
+        "y": 1378.2857055664062,
+        "wires": [
+            [
+                "7982dc424a0db32f",
+                "b5b8fac8979e9111"
+            ]
+        ]
+    },
+    {
+        "id": "abede91c314fd490",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 156",
+        "func": "const token = msg.req.headers.authorization\n\nmsg.url=env.get(\"vender\")\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`,\n    \n};\n\nconst payload={\n    query:`mutation Logout {\n        logout {\n            success\n        }\n    }`\n}\nmsg.payload=payload\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 320,
+        "wires": [
+            [
+                "d9e161eca2b92a1a"
+            ]
+        ]
+    },
+    {
+        "id": "bb44dae79b632427",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "customer/logout",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 190,
+        "y": 320,
+        "wires": [
+            [
+                "abede91c314fd490"
+            ]
+        ]
+    },
+    {
+        "id": "d9e161eca2b92a1a",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 610,
+        "y": 320,
+        "wires": [
+            [
+                "2bc8bce3b55ea9d1"
+            ]
+        ]
+    },
+    {
+        "id": "2bc8bce3b55ea9d1",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "statusCode",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "200",
+                "vt": "num"
+            },
+            {
+                "t": "neq",
+                "v": "200",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 750,
+        "y": 320,
+        "wires": [
+            [
+                "ed662970f781369c",
+                "60df559bc7df6dd7"
+            ],
+            [
+                "ed662970f781369c",
+                "2e09594a3b2fb332"
+            ]
+        ]
+    },
+    {
+        "id": "60df559bc7df6dd7",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1090,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "ed662970f781369c",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 214",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1110,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "2e09594a3b2fb332",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1090,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "ce39858b8ae17291",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "LOGOUT",
+        "info": "",
+        "x": 130,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "a9ee64b81c2012a0",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "SET ORDER SHIPPING ADDRESS",
+        "info": "",
+        "x": 220,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "48db769ccd63d73d",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 750,
+        "y": 1540,
+        "wires": [
+            [
+                "7445d2b3d3f1ef55"
+            ],
+            [
+                "57794808a13e68cc"
+            ]
+        ]
+    },
+    {
+        "id": "cedcedaa9050756f",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/order/shippingaddress",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 214,
+        "y": 1538.2857055664062,
+        "wires": [
+            [
+                "f8f8106c330abfc0"
+            ]
+        ]
+    },
+    {
+        "id": "f8f8106c330abfc0",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 167",
+        "func": "const token = msg.req.headers.authorization\nconst fullName= msg.req.body.fullName\nconst company= msg.req.body.company\nconst streetLine1= msg.req.body.streetLine1\nconst streetLine2= msg.req.body.streetLine2\nconst province=msg.req.body.province\nconst city= msg.req.body.city\nconst postalCode= msg.req.body.postalCode\nconst countryCode= msg.req.body.countryCode\nconst phoneNumber= msg.req.body.phoneNumber\nconst defaultShippingAddress= msg.req.body\nconst defaultBillingAddress=msg.req.body\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`\n    \n};\n\nmsg.url = env.get(\"vender\")\nconsole.log(msg.url)\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`\n};\n\nconst payload = {\n  query: `\n  mutation SetOrderShippingAddress(\n    $fullName: String!,\n    $company: String!,\n    $streetLine1: String!,\n    $streetLine2: String!,\n    $city: String!,\n    $province: String!,\n    $postalCode: String!,\n    $countryCode: String!,\n    $phoneNumber: String!,\n    $defaultShippingAddress: Boolean!,\n    $defaultBillingAddress: Boolean!,\n    $customFields: JSON\n  ) {\n    setOrderShippingAddress(input: {\n        fullName: $fullName,\n        company: $company,\n        streetLine1: $streetLine1,\n        streetLine2: $streetLine2,\n        province: $province,\n        city: $city,\n        postalCode: $postalCode,\n        countryCode: $countryCode,\n        phoneNumber: $phoneNumber,\n        defaultShippingAddress: $defaultShippingAddress,\n        defaultBillingAddress: $defaultBillingAddress,\n        customFields:$customFields\n    }) {\n        ... on Order {\n            id\n            createdAt\n            updatedAt\n            type\n            orderPlacedAt\n            code\n            state\n            active\n            couponCodes\n            totalQuantity\n            subTotal\n            subTotalWithTax\n            currencyCode\n            shipping\n            shippingWithTax\n            total\n            totalWithTax\n            customFields\n        }\n        ... on NoActiveOrderError {\n            errorCode\n            message\n        }\n    }\n}`,\n  variables: {\n      fullName: fullName,\n      company: company,\n      streetLine1: streetLine1,\n      streetLine2: streetLine2,\n      province: province,\n      city: city,\n      postalCode: postalCode,\n      countryCode: countryCode,\n      phoneNumber: phoneNumber,\n      defaultShippingAddress: true,\n      defaultBillingAddress: false\n  }\n};\n\n\n\nif (!token) {\n  msg.message = \"Pass token inside Headers\"\n  msg.statusCode = 400\n\n\n} if(token) {\n  msg.payload = payload\n  msg.statusCode = 200\n}\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 444,
+        "y": 1538.2857055664062,
+        "wires": [
+            [
+                "249ed76dafa5adb4"
+            ]
+        ]
+    },
+    {
+        "id": "249ed76dafa5adb4",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 610,
+        "y": 1540,
+        "wires": [
+            [
+                "48db769ccd63d73d"
+            ]
+        ]
+    },
+    {
+        "id": "ed2cdb715345fc12",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 223",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1190,
+        "y": 1560,
+        "wires": []
+    },
+    {
+        "id": "b3066906b0e2547d",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1170,
+        "y": 1500,
+        "wires": []
+    },
+    {
+        "id": "7445d2b3d3f1ef55",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 168",
+        "func": "if(msg.payload.errors[0].message){\n  msg.payload = {\n    \n    message: msg.payload.errors[0].message\n  };\n  msg.statusCode=400\n}\nif (msg.message == \"Pass token inside Headers\"){\n  msg.payload={\n    msg:\"Pass The Token Inside the Headers\"\n  }\n  msg.statusCode=400\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 1500,
+        "wires": [
+            [
+                "ed2cdb715345fc12",
+                "b3066906b0e2547d"
+            ]
+        ]
+    },
+    {
+        "id": "57794808a13e68cc",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 169",
+        "func": "\n if (msg.payload.data.setOrderShippingAddress.errorCode){\n\n    msg.payload.msg= \"Failed to Data added to card\",\n\n    msg.statusCode = 400\n}if(msg.payload.data.setOrderShippingAddress.id){\n    msg.payload={\n        message : \"Successfully added the shipping address\",\n    }\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 1560,
+        "wires": [
+            [
+                "ed2cdb715345fc12",
+                "b3066906b0e2547d"
+            ]
+        ]
+    },
+    {
+        "id": "f0cd4bcb525f9be1",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 750,
+        "y": 1760,
+        "wires": [
+            [
+                "12d078cae83340ec"
+            ],
+            [
+                "26e75641852f6a80"
+            ]
+        ]
+    },
+    {
+        "id": "efaeda565e0e02b4",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/order/billingaddress",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 204,
+        "y": 1758.2857055664062,
+        "wires": [
+            [
+                "4619c090446887fa"
+            ]
+        ]
+    },
+    {
+        "id": "4619c090446887fa",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 170",
+        "func": "const token = msg.req.headers.authorization\nconst fullName= msg.req.body.fullName\nconst company= msg.req.body.company\nconst streetLine1= msg.req.body.streetLine1\nconst streetLine2= msg.req.body.streetLine2\nconst province=msg.req.body.province\nconst city= msg.req.body.city\nconst postalCode= msg.req.body.postalCode\nconst countryCode= msg.req.body.countryCode\nconst phoneNumber= msg.req.body.phoneNumber\nconst defaultShippingAddress= msg.req.body\nconst defaultBillingAddress=msg.req.body\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`\n    \n};\n\nmsg.url = env.get(\"vender\")\nconsole.log(msg.url)\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`\n};\n\nconst payload = {\n  query: `\n  mutation setOrderBillingAddress(\n    $fullName: String!,\n    $company: String!,\n    $streetLine1: String!,\n    $streetLine2: String!,\n    $city: String!,\n    $province: String!,\n    $postalCode: String!,\n    $countryCode: String!,\n    $phoneNumber: String!,\n    $defaultShippingAddress: Boolean!,\n    $defaultBillingAddress: Boolean!,\n    $customFields: JSON\n  ) {\n    setOrderBillingAddress(input: {\n        fullName: $fullName,\n        company: $company,\n        streetLine1: $streetLine1,\n        streetLine2: $streetLine2,\n        province: $province,\n        city: $city,\n        postalCode: $postalCode,\n        countryCode: $countryCode,\n        phoneNumber: $phoneNumber,\n        defaultShippingAddress: $defaultShippingAddress,\n        defaultBillingAddress: $defaultBillingAddress,\n        customFields:$customFields\n    }) {\n        ... on Order {\n            id\n            createdAt\n            updatedAt\n            type\n            orderPlacedAt\n            code\n            state\n            active\n            couponCodes\n            totalQuantity\n            subTotal\n            subTotalWithTax\n            currencyCode\n            shipping\n            shippingWithTax\n            total\n            totalWithTax\n            customFields\n            billingAddress {\n                fullName\n                company\n                streetLine1\n                streetLine2\n                city\n                province\n                postalCode\n                country\n                countryCode\n                phoneNumber\n                customFields\n            }\n            shippingAddress {\n                fullName\n                company\n                streetLine1\n                streetLine2\n                city\n                province\n                postalCode\n                country\n                countryCode\n                phoneNumber\n                customFields\n            }\n        }\n        ... on NoActiveOrderError {\n            errorCode\n            message\n        }\n    }\n}`,\n  variables: {\n      fullName: fullName,\n      company: company,\n      streetLine1: streetLine1,\n      streetLine2: streetLine2,\n      province: province,\n      city: city,\n      postalCode: postalCode,\n      countryCode: countryCode,\n      phoneNumber: phoneNumber,\n      defaultShippingAddress: true,\n      defaultBillingAddress: false\n  }\n};\n\n\n\nif (!token) {\n  msg.message = \"Pass token inside Headers\"\n  msg.statusCode = 400\n\n\n} if(token) {\n  msg.payload = payload\n  msg.statusCode = 200\n}\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 444,
+        "y": 1758.2857055664062,
+        "wires": [
+            [
+                "a89ca5536e85d9e3"
+            ]
+        ]
+    },
+    {
+        "id": "a89ca5536e85d9e3",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 610,
+        "y": 1760,
+        "wires": [
+            [
+                "f0cd4bcb525f9be1"
+            ]
+        ]
+    },
+    {
+        "id": "bb295e3e17a93f47",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 224",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1190,
+        "y": 1780,
+        "wires": []
+    },
+    {
+        "id": "8acfc25eb4da8e01",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1170,
+        "y": 1720,
+        "wires": []
+    },
+    {
+        "id": "12d078cae83340ec",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 171",
+        "func": "if(msg.payload.errors[0].message){\n  msg.payload = {\n    \n    message: msg.payload.errors[0].message\n  };\n  msg.statusCode=400\n}\nif (msg.message == \"Pass token inside Headers\"){\n  msg.payload={\n    msg:\"Pass The Token Inside the Headers\"\n  }\n  msg.statusCode=400\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 1720,
+        "wires": [
+            [
+                "bb295e3e17a93f47",
+                "8acfc25eb4da8e01"
+            ]
+        ]
+    },
+    {
+        "id": "26e75641852f6a80",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 172",
+        "func": "\nif (msg.payload.data.setOrderBillingAddress.errorCode){\n\n    msg.payload.msg= \"Failed to Data added to card\",\n\n    msg.statusCode = 400\n}if(msg.payload.data.setOrderBillingAddress.id){\n    msg.payload={\n        message : \"Successfully added the billing address\",\n    }\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 1780,
+        "wires": [
+            [
+                "bb295e3e17a93f47",
+                "8acfc25eb4da8e01"
+            ]
+        ]
+    },
+    {
+        "id": "41bc857b7da267e1",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "SET ORDER BILLING ADDRESS",
+        "info": "",
+        "x": 210,
+        "y": 1640,
+        "wires": []
+    },
+    {
+        "id": "3b1a3b32bf1a70ae",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Eligible Shipping Methods",
+        "info": "",
+        "x": 190,
+        "y": 1860,
+        "wires": []
+    },
+    {
+        "id": "2d940187e8544dc7",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/order/eligibleshippingmethod",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 240,
+        "y": 1960,
+        "wires": [
+            [
+                "3a8d89d6327df77b"
+            ]
+        ]
+    },
+    {
+        "id": "3a8d89d6327df77b",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 173",
+        "func": "// Check if the authorization token is present\nconst token = msg.req.headers.authorization\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`,\n\n};\nmsg.url = env.get(\"vender\")\nconst payload = {\n    query: `query EligibleShippingMethods {\n    eligibleShippingMethods {\n        id\n        price\n        priceWithTax\n        code\n        name\n        description\n        metadata\n        customFields\n    }\n}\n`\n}\nif (token) {\n\n    msg.payload = payload\n    msg.statusCode = 200\n} else {\n    msg.payload.alert = \"Pass token inside Headers\"\n    msg.statusCode = 400\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 1960,
+        "wires": [
+            [
+                "8c1fa686f2959dc2"
+            ]
+        ]
+    },
+    {
+        "id": "8c1fa686f2959dc2",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 670,
+        "y": 1960,
+        "wires": [
+            [
+                "2ac116ae4b5fd99c"
+            ]
+        ]
+    },
+    {
+        "id": "2ac116ae4b5fd99c",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 810,
+        "y": 1960,
+        "wires": [
+            [
+                "7091c883e70f923b"
+            ],
+            [
+                "c63d2e188e6d5758"
+            ]
+        ]
+    },
+    {
+        "id": "cae97e8b62688a97",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 227",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1190,
+        "y": 1980,
+        "wires": []
+    },
+    {
+        "id": "4992d08342e7ac97",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1170,
+        "y": 1920,
+        "wires": []
+    },
+    {
+        "id": "7091c883e70f923b",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 178",
+        "func": "if(msg.payload.errors[0].message){\n \n  msg.statusCode=400\n}\nif(msg.payload.errors[0].message == \"GraphQL operations must contain a non-empty `query` or a `persistedQuery` extension.\"){\n  msg.payload.msg=\"Pass The Token Inside the Headers\"\n  \n  msg.statusCode=400\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 1920,
+        "wires": [
+            [
+                "cae97e8b62688a97",
+                "4992d08342e7ac97"
+            ]
+        ]
+    },
+    {
+        "id": "c63d2e188e6d5758",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 179",
+        "func": "\nif (msg.payload.data.eligibleShippingMethods.errorCode){\n\n    msg.payload.msg= \"Failed to Data added to card\",\n\n    msg.statusCode = 400\n} if (msg.payload.data.eligibleShippingMethods.id){\n    msg.payload.msg=\"Sucessfully get all the shipment method\"\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 970,
+        "y": 1980,
+        "wires": [
+            [
+                "cae97e8b62688a97",
+                "4992d08342e7ac97"
+            ]
+        ]
+    },
+    {
+        "id": "355b398bf447a223",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 750,
+        "y": 2160,
+        "wires": [
+            [
+                "260ae96e37bf4dd6"
+            ],
+            [
+                "62620594857f9659"
+            ]
+        ]
+    },
+    {
+        "id": "0f108a98c6058a5b",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/order/setshippingmethod",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 224,
+        "y": 2158.2857055664062,
+        "wires": [
+            [
+                "afd720a380c244c5"
+            ]
+        ]
+    },
+    {
+        "id": "afd720a380c244c5",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 180",
+        "func": "const token = msg.req.headers.authorization\nconst shippingMethodId= msg.req.body.shippingMethodId\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`\n    \n};\n\nmsg.url = env.get(\"vender\")\nconsole.log(msg.url)\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`\n};\n\nconst payload = {\n  query: `\n  mutation SetOrderShippingMethod($shippingMethodId:[ID!]!){\n    setOrderShippingMethod(shippingMethodId: $shippingMethodId) {\n        ... on Order {\n            id\n            createdAt\n            updatedAt\n            type\n            orderPlacedAt\n            code\n            state\n            active\n            couponCodes\n            totalQuantity\n            subTotal\n            subTotalWithTax\n            currencyCode\n            shipping\n            shippingWithTax\n            total\n            totalWithTax\n            customFields\n            shippingAddress {\n                fullName\n                company\n                streetLine1\n                streetLine2\n                city\n                province\n                postalCode\n                country\n                countryCode\n                phoneNumber\n                customFields\n            }\n        }\n        ... on OrderModificationError {\n            errorCode\n            message\n        }\n        ... on IneligibleShippingMethodError {\n            errorCode\n            message\n        }\n        ... on NoActiveOrderError {\n            errorCode\n            message\n        }\n    }\n}\n`,\nvariables:{\n    shippingMethodId:shippingMethodId\n}\n};\n\n\n\nif (!token) {\n  msg.message = \"Pass token inside Headers\"\n  msg.statusCode = 400\n\n\n} if(token) {\n  msg.payload = payload\n  msg.statusCode = 200\n}\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 444,
+        "y": 2158.2857055664062,
+        "wires": [
+            [
+                "9da6f9c09cbc48f9"
+            ]
+        ]
+    },
+    {
+        "id": "9da6f9c09cbc48f9",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 610,
+        "y": 2160,
+        "wires": [
+            [
+                "355b398bf447a223"
+            ]
+        ]
+    },
+    {
+        "id": "6c6b11ef66c8288e",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 228",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1190,
+        "y": 2180,
+        "wires": []
+    },
+    {
+        "id": "575e2889b1b6c3dd",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1170,
+        "y": 2120,
+        "wires": []
+    },
+    {
+        "id": "260ae96e37bf4dd6",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 181",
+        "func": "if(msg.payload.errors[0].message){\n  msg.payload = {\n    \n    message: msg.payload.errors[0].message\n  };\n  msg.statusCode=400\n}\nif (msg.message == \"Pass token inside Headers\"){\n  msg.payload={\n    msg:\"Pass The Token Inside the Headers\"\n  }\n  msg.statusCode=400\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 2120,
+        "wires": [
+            [
+                "6c6b11ef66c8288e",
+                "575e2889b1b6c3dd"
+            ]
+        ]
+    },
+    {
+        "id": "62620594857f9659",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 182",
+        "func": "\nif (msg.payload.data.setOrderShippingMethod.errorCode){\n\n    msg.payload.msg= \"Failed to  add setOrderShippingMethod\",\n\n    msg.statusCode = 400\n}if(msg.payload.data.setOrderShippingMethod.id){\n    msg.payload={\n        message : \"Successfully added the setOrderShippingMethod\",\n    }\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 910,
+        "y": 2180,
+        "wires": [
+            [
+                "6c6b11ef66c8288e",
+                "575e2889b1b6c3dd"
+            ]
+        ]
+    },
+    {
+        "id": "e621e5b5e7488dd9",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Set Shipping Method",
+        "info": "",
+        "x": 210,
+        "y": 2060,
+        "wires": []
+    },
+    {
+        "id": "a8ac83191834d7e0",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Check the next stages",
+        "info": "",
+        "x": 220,
+        "y": 2280,
+        "wires": []
+    },
+    {
+        "id": "52020b51984ec79d",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "customar/checkstage",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 200,
+        "y": 2380,
+        "wires": [
+            [
+                "746c75884cf734a0"
+            ]
+        ]
+    },
+    {
+        "id": "746c75884cf734a0",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 184",
+        "func": "// Check if the authorization token is present\nconst token = msg.req.headers.authorization\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`,\n\n};\nmsg.url = env.get(\"vender\")\nconst payload = {\n    query: `query NextOrderStates {\n    nextOrderStates\n}\n`\n}\nif (token) {\n\n    msg.payload = payload\n    msg.statusCode = 200\n} else {\n    msg.payload.alert = \"Pass token inside Headers\"\n    msg.statusCode = 400\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 2380,
+        "wires": [
+            [
+                "64dfcae1a50566f1"
+            ]
+        ]
+    },
+    {
+        "id": "64dfcae1a50566f1",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 670,
+        "y": 2380,
+        "wires": [
+            [
+                "3768ebc78312589a"
+            ]
+        ]
+    },
+    {
+        "id": "3768ebc78312589a",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 850,
+        "y": 2380,
+        "wires": [
+            [
+                "cda53ab3efd7cda3"
+            ],
+            [
+                "3c4716b543ff6bd6"
+            ]
+        ]
+    },
+    {
+        "id": "d58a3b66046ef239",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 230",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1230,
+        "y": 2400,
+        "wires": []
+    },
+    {
+        "id": "113278a014397a88",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1210,
+        "y": 2340,
+        "wires": []
+    },
+    {
+        "id": "cda53ab3efd7cda3",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 186",
+        "func": "if(msg.payload.errors[0].message){\n \n  msg.statusCode=400\n}\nif(msg.payload.errors[0].message == \"GraphQL operations must contain a non-empty `query` or a `persistedQuery` extension.\"){\n  msg.payload.msg=\"Pass The Token Inside the Headers\"\n  \n  msg.statusCode=400\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 2340,
+        "wires": [
+            [
+                "d58a3b66046ef239",
+                "113278a014397a88"
+            ]
+        ]
+    },
+    {
+        "id": "3c4716b543ff6bd6",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 187",
+        "func": "\nif (msg.payload.data.nextOrderStates.errorCode){\n\n    msg.payload.msg= \"Failed to Data added to card\",\n\n    msg.statusCode = 400\n} if (msg.payload.data.nextOrderStates){\n    msg.payload.msg=\"Sucessfully get the next steps\"\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1010,
+        "y": 2400,
+        "wires": [
+            [
+                "d58a3b66046ef239",
+                "113278a014397a88"
+            ]
+        ]
+    },
+    {
+        "id": "e5eff5743814464a",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 770,
+        "y": 2620,
+        "wires": [
+            [
+                "c669039eb92df99c"
+            ],
+            [
+                "719d95c7c6d9dce6"
+            ]
+        ]
+    },
+    {
+        "id": "4b6df9eaa29c63df",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/order/arrangethepayment",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 244,
+        "y": 2618.2857055664062,
+        "wires": [
+            [
+                "e5e123bac7962b45"
+            ]
+        ]
+    },
+    {
+        "id": "e5e123bac7962b45",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 188",
+        "func": "const token = msg.req.headers.authorization\nconst state = msg.req.body.state\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`\n    \n};\n\nmsg.url = env.get(\"vender\")\nconsole.log(msg.url)\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`\n};\n\nconst payload = {\n    query: `\nmutation TransitionOrderToState($state:String!) {\n    transitionOrderToState(state: $state) {\n        ... on Order {\n            id\n            createdAt\n            updatedAt\n            type\n            orderPlacedAt\n            code\n            state\n            active\n            couponCodes\n            totalQuantity\n            subTotal\n            subTotalWithTax\n            currencyCode\n            shipping\n            shippingWithTax\n            total\n            totalWithTax\n            customFields\n        }\n        ... on OrderStateTransitionError {\n            errorCode\n            message\n            transitionError\n            fromState\n            toState\n        }\n    }\n}\n`,\nvariables:{\n    state: state\n}\n};\n\n\n\nif (!token) {\n  msg.message = \"Pass token inside Headers\"\n  msg.statusCode = 400\n\n\n} if(token) {\n  msg.payload = payload\n  msg.statusCode = 200\n}\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 464,
+        "y": 2618.2857055664062,
+        "wires": [
+            [
+                "aa8f8b74d1e3098f"
+            ]
+        ]
+    },
+    {
+        "id": "aa8f8b74d1e3098f",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 2620,
+        "wires": [
+            [
+                "e5eff5743814464a"
+            ]
+        ]
+    },
+    {
+        "id": "d25db90c5ea81288",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 231",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1210,
+        "y": 2640,
+        "wires": []
+    },
+    {
+        "id": "43ab6bc6ce9da13a",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1190,
+        "y": 2580,
+        "wires": []
+    },
+    {
+        "id": "c669039eb92df99c",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 189",
+        "func": "if(msg.payload.errors[0].message){\n  msg.payload = {\n    \n    message: msg.payload.errors[0].message\n  };\n  msg.statusCode=400\n}\nif (msg.message == \"Pass token inside Headers\"){\n  msg.payload={\n    msg:\"Pass The Token Inside the Headers\"\n  }\n  msg.statusCode=400\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 2580,
+        "wires": [
+            [
+                "d25db90c5ea81288",
+                "43ab6bc6ce9da13a"
+            ]
+        ]
+    },
+    {
+        "id": "719d95c7c6d9dce6",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 190",
+        "func": "\nif (msg.payload.data.transitionOrderToState.errorCode){\n\n    msg.payload.msg = \"Failed to  change transitionOrderToState\",\n\n    msg.statusCode = 400\n} if (msg.payload.data.transitionOrderToState.id){\n    msg.payload={\n        message: \"Successfully changes the transitionOrderToState\",\n    }\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 2640,
+        "wires": [
+            [
+                "d25db90c5ea81288",
+                "43ab6bc6ce9da13a"
+            ]
+        ]
+    },
+    {
+        "id": "ea82d175807782c9",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Arrange Payment Order",
+        "info": "",
+        "x": 220,
+        "y": 2540,
+        "wires": []
+    },
+    {
+        "id": "09c7514196d7e20f",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Add Payment To Order",
+        "info": "",
+        "x": 220,
+        "y": 2720,
+        "wires": []
+    },
+    {
+        "id": "65b21ef77fd59fc6",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 770,
+        "y": 2820,
+        "wires": [
+            [
+                "6b58d6bcd853a3e5"
+            ],
+            [
+                "b9ac27de5c240c42"
+            ]
+        ]
+    },
+    {
+        "id": "4eedae7879782906",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/order/addthepayment",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 234,
+        "y": 2818.2857055664062,
+        "wires": [
+            [
+                "85817a194f72972a"
+            ]
+        ]
+    },
+    {
+        "id": "85817a194f72972a",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 191",
+        "func": "const token = msg.req.headers.authorization\nconst method = msg.req.body.method\nconst metadata = msg.req.body.metadata\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`\n    \n};\n\nmsg.url = env.get(\"vender\")\nconsole.log(msg.url)\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`\n};\n\nconst payload = {\n    query: `mutation AddPaymentToOrder($method:String!,$metadata:JSON!) {\n    addPaymentToOrder(\n        input: {\n            method: $method\n            metadata: $metadata\n        }\n    ) {\n        ... on Order {\n            id\n            createdAt\n            updatedAt\n            type\n            orderPlacedAt\n            code\n            state\n            active\n            couponCodes\n            totalQuantity\n            subTotal\n            subTotalWithTax\n            currencyCode\n            shipping\n            shippingWithTax\n            total\n            totalWithTax\n            customFields\n            payments {\n                id\n                createdAt\n                updatedAt\n                method\n                amount\n                state\n                transactionId\n                errorMessage\n                metadata\n            }\n        }\n        ... on OrderPaymentStateError {\n            errorCode\n            message\n        }\n        ... on IneligiblePaymentMethodError {\n            errorCode\n            message\n            eligibilityCheckerMessage\n        }\n        ... on PaymentFailedError {\n            errorCode\n            message\n            paymentErrorMessage\n        }\n        ... on PaymentDeclinedError {\n            errorCode\n            message\n            paymentErrorMessage\n        }\n        ... on OrderStateTransitionError {\n            errorCode\n            message\n            transitionError\n            fromState\n            toState\n        }\n        ... on NoActiveOrderError {\n            errorCode\n            message\n        }\n    }\n}\n`,\nvariables:{\n    method: method,\n    metadata: metadata\n}\n};\n\n\n\nif (!token) {\n  msg.message = \"Pass token inside Headers\"\n  msg.statusCode = 400\n\n\n} if(token) {\n  msg.payload = payload\n  msg.statusCode = 200\n}\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 2820,
+        "wires": [
+            [
+                "e7052c842d155c52"
+            ]
+        ]
+    },
+    {
+        "id": "e7052c842d155c52",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 2820,
+        "wires": [
+            [
+                "65b21ef77fd59fc6"
+            ]
+        ]
+    },
+    {
+        "id": "144a807d661aa11b",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 232",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1210,
+        "y": 2840,
+        "wires": []
+    },
+    {
+        "id": "c517d0dcab1e61a5",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1190,
+        "y": 2780,
+        "wires": []
+    },
+    {
+        "id": "6b58d6bcd853a3e5",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 192",
+        "func": "if(msg.payload.errors[0].message){\n  msg.payload = {\n    \n    message: msg.payload.errors[0].message\n  };\n  msg.statusCode=400\n}\nif (msg.message == \"Pass token inside Headers\"){\n  msg.payload={\n    msg:\"Pass The Token Inside the Headers\"\n  }\n  msg.statusCode=400\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 2780,
+        "wires": [
+            [
+                "144a807d661aa11b",
+                "c517d0dcab1e61a5"
+            ]
+        ]
+    },
+    {
+        "id": "b9ac27de5c240c42",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 193",
+        "func": "\nif (msg.payload.data.addPaymentToOrder.errorCode){\n\n    msg.payload.msg = \"Failed to  add addPaymentToOrder\",\n\n    msg.statusCode = 400\n} if (msg.payload.data.addPaymentToOrder.id){\n    msg.payload={\n        message: \"Successfully add the addPaymentToOrder\",\n    }\n    msg.statusCode = 200\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 2840,
+        "wires": [
+            [
+                "144a807d661aa11b",
+                "c517d0dcab1e61a5"
+            ]
+        ]
+    },
+    {
+        "id": "9a8a0e704c22ba7d",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/api/v1/cart/cartdetails",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 180,
+        "y": 720,
+        "wires": [
+            [
+                "c82467a5417fc490"
+            ]
+        ]
+    },
+    {
+        "id": "c82467a5417fc490",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 194",
+        "func": "// Check if the authorization token is present\nconst token = msg.req.headers.authorization\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`,\n    \n};\nmsg.url=env.get(\"vender\")\nconst payload={\n    query:`query ActiveOrder {\n    activeOrder {\n        id\n        type\n        orderPlacedAt\n        code\n        state\n        active\n        totalQuantity\n        subTotal\n        currencyCode\n        total\n        totalWithTax\n        customFields\n        lines {\n            id\n            quantity\n            orderPlacedQuantity\n            productVariant {\n                id\n                productId\n                name\n                price\n                currencyCode\n                priceWithTax\n                stockLevel\n                product {\n                    id\n                    name\n                    slug\n                    description\n                    featuredAsset {\n                        id\n                        name\n                        type\n                        fileSize\n                        mimeType\n                        width\n                        height\n                        source\n                        preview\n                    }\n                }\n                sku\n            }\n        }\n    }\n}\n`\n}\nif(token){\n\n    msg.payload=payload\n    msg.statusCode=200\n}else{\n    msg.payload.alert=\"Pass token inside Headers\"\n    msg.statusCode=400\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 416,
+        "y": 721.7142944335938,
+        "wires": [
+            [
+                "5e22ade19fd6556f"
+            ]
+        ]
+    },
+    {
+        "id": "5e22ade19fd6556f",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 596,
+        "y": 721.7142944335938,
+        "wires": [
+            [
+                "0cf28378ba375c53"
+            ]
+        ]
+    },
+    {
+        "id": "0cf28378ba375c53",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 736,
+        "y": 721.7142944335938,
+        "wires": [
+            [
+                "d2b25aad9f9f63a6"
+            ],
+            [
+                "c3141670e257e203"
+            ]
+        ]
+    },
+    {
+        "id": "26ab4377d27a90ce",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "GET CART DETAILS",
+        "info": "",
+        "x": 166,
+        "y": 621.7142944335938,
+        "wires": []
+    },
+    {
+        "id": "cbcab329ef8867e7",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 233",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1156,
+        "y": 741.7142944335938,
+        "wires": []
+    },
+    {
+        "id": "bf027b1f95e22752",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "Status Code",
+        "statusCode": "",
+        "headers": {},
+        "x": 1156,
+        "y": 681.7142944335938,
+        "wires": []
+    },
+    {
+        "id": "d2b25aad9f9f63a6",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 195",
+        "func": "let data=msg.payload.data.activeorder\nif(msg.payload.data.activeOrder==null){\n    \n    msg.payload.message= \"YOU HAVE NOT ADDED ANY PRODUCT IN YOUR CART\"\n    msg.statusCode = 200\n}\nif(msg.payload.data.activeOrder){\n    \n    msg.payload.message= \"User Cart Data Successfully Get\",\n    \n    msg.statusCode=200\n    \n}\n\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 916,
+        "y": 681.7142944335938,
+        "wires": [
+            [
+                "cbcab329ef8867e7",
+                "bf027b1f95e22752"
+            ]
+        ]
+    },
+    {
+        "id": "c3141670e257e203",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 196",
+        "func": "if (msg.payload.errors[0].message) {\n    msg.payload = {\n        msg: \"Failed to get the User Cart Data and need to pass the Token\",\n        message: msg.payload.errors[0].message\n    };\n    msg.statusCode=400   \n}\n\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 916,
+        "y": 741.7142944335938,
+        "wires": [
+            [
+                "bf027b1f95e22752",
+                "cbcab329ef8867e7"
+            ]
+        ]
+    },
+    {
+        "id": "174be218e04cfcdb",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "User Order Details",
+        "info": "",
+        "x": 210,
+        "y": 2900,
+        "wires": []
+    },
+    {
+        "id": "aeaa7bf8d4c247ea",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "api/v1/order/orderdetails",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 230,
+        "y": 3000,
+        "wires": [
+            [
+                "34b4a29d965b880b"
+            ]
+        ]
+    },
+    {
+        "id": "34b4a29d965b880b",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 197",
+        "func": "// Check if the authorization token is present\nconst token = msg.req.headers.authorization\n\nmsg.headers = {\n    \"Content-Type\": \"application/json\",\n    \"Authorization\": `Bearer ${token}`,\n\n};\nmsg.url = env.get(\"vender\")\nconst payload = {\n    query: `query Order {\n    activeCustomer {\n        id\n        title\n        firstName\n        lastName\n        phoneNumber\n        emailAddress\n        orders {\n            totalItems\n            items {\n                id\n                type\n                orderPlacedAt\n                code\n                state\n                active\n                couponCodes\n                totalQuantity\n                subTotal\n                subTotalWithTax\n                currencyCode\n                shipping\n                shippingWithTax\n                total\n                totalWithTax\n                customFields\n            }\n        }\n    }\n}\n\n`\n}\nif(token){\n\n    msg.payload=payload\n    msg.statusCode=200\n}else{\n    msg.payload.alert=\"Pass token inside Headers\"\n    msg.statusCode=400\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 3000,
+        "wires": [
+            [
+                "99a8e7406286e9df"
+            ]
+        ]
+    },
+    {
+        "id": "99a8e7406286e9df",
+        "type": "http request",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 690,
+        "y": 3000,
+        "wires": [
+            [
+                "f13dbe29c3b848c3",
+                "666e359f3a90e621"
+            ]
+        ]
+    },
+    {
+        "id": "f13dbe29c3b848c3",
+        "type": "switch",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "hask",
+                "v": "data",
+                "vt": "str"
+            },
+            {
+                "t": "hask",
+                "v": "errors",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 830,
+        "y": 3000,
+        "wires": [
+            [
+                "907e84df11e2d368"
+            ],
+            [
+                "48585d2f7beaaf78"
+            ]
+        ]
+    },
+    {
+        "id": "5ae8e37e818bca05",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 236",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1210,
+        "y": 3020,
+        "wires": []
+    },
+    {
+        "id": "6b868c1c090609aa",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1190,
+        "y": 2960,
+        "wires": []
+    },
+    {
+        "id": "907e84df11e2d368",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 198",
+        "func": "let data=msg.payload.data.activeorder\nif (msg.payload.data.activeCustomer.orders ==null){\n    \n    msg.payload.message= \"YOU HAVE NOT ORDER ANYTHINg\"\n    msg.statusCode = 200\n}\nif (msg.payload.data.activeCustomer.orders){\n    \n    \n    msg.payload={\n        OrderDetails: msg.payload.data.activeCustomer.orders,\n        message: \"User Order Details Get Successfully\"\n    }\n    msg.statusCode=200\n    \n}\n\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 2960,
+        "wires": [
+            [
+                "5ae8e37e818bca05",
+                "6b868c1c090609aa"
+            ]
+        ]
+    },
+    {
+        "id": "48585d2f7beaaf78",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 199",
+        "func": "\nif (msg.payload.errors[0].message) {\n    msg.payload = {\n        msg: \"Failed to get the Order Details and need to pass the Token\",\n        message: msg.payload.errors[0].message\n    };\n    msg.statusCode=400   \n}\n\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 3020,
+        "wires": [
+            [
+                "5ae8e37e818bca05",
+                "6b868c1c090609aa"
+            ]
+        ]
+    },
+    {
+        "id": "666e359f3a90e621",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 237",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 2940,
+        "wires": []
+    },
+    {
+        "id": "f276c755f4253318",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/v1/userLogin",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 220,
+        "y": 3780,
+        "wires": [
+            [
+                "86e886230de60442"
+            ]
+        ]
+    },
+    {
+        "id": "17fd32afce4f83c5",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 750,
+        "y": 3740,
+        "wires": []
+    },
+    {
+        "id": "32c30e4681086703",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 244",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 3780,
+        "wires": []
+    },
+    {
+        "id": "6debc82ac5e0c565",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Customer Login",
+        "info": "",
+        "x": 180,
+        "y": 3720,
+        "wires": []
+    },
+    {
+        "id": "3a64df587cff84ca",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/v1/adminLogin",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 225,
+        "y": 3940,
+        "wires": [
+            [
+                "631b983f04c5e18c"
+            ]
+        ]
+    },
+    {
+        "id": "508c065dd707daa6",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 735,
+        "y": 3900,
+        "wires": []
+    },
+    {
+        "id": "fd442b9698954b56",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 245",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 815,
+        "y": 3940,
+        "wires": []
+    },
+    {
+        "id": "9f81a4dfd8aa108d",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Admin Login",
+        "info": "",
+        "x": 195,
+        "y": 3880,
+        "wires": []
+    },
+    {
+        "id": "631b983f04c5e18c",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 200",
+        "func": "const userData = msg.req.body;\nconst apiURL = env.get(\"adminUrl\");\n\n// Check if both username and password are provided\nconst requiredFields = ['username', 'password'];\nfor (const field of requiredFields) {\n    if (!userData[field]) {\n        msg.payload = {\n            error: `${field} is required`\n        };\n        msg.statusCode = 400; // Bad Request\n        return msg;\n    }\n}\n// Construct the GraphQL mutation payload\nconst payload = {\n    query: `\n        mutation Login ($username:String!,$password:String!){\n            login(username: $username, password:$password) {\n                ... on CurrentUser {\n                    id\n                    identifier\n                }\n                ... on InvalidCredentialsError {\n                    errorCode\n                    message\n                    authenticationError\n                }\n                ... on NativeAuthStrategyError {\n                    errorCode\n                    message\n                }\n            }\n        }\n    `,\n    variables: {\n        \"username\": userData.username,\n        \"password\": userData.password\n    }\n};\n\ntry {\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json',\n        }\n    });\n\n    console.log(response.data);\n\n    // Check the response for different error codes\n    if (response.data.data.login.errorCode) {\n        const errorCode = response.data.data.login.errorCode;\n        const errorMessage = response.data.data.login.message;\n\n        // Handle different error cases\n        if (errorCode === 'NOT_VERIFIED_ERROR') {\n            msg.payload = {\n                errorCode,\n                message: errorMessage\n            };\n            msg.statusCode = 401; // Unauthorized\n        } else if (errorCode === 'INVALID_CREDENTIALS_ERROR') {\n            msg.payload = {\n                error:\"Login Failed !\",\n                message: \"Invalid username or password\",\n            };\n            msg.statusCode = 401; // Unauthorized\n        }\n    } else {\n        const token = response.headers['vendure-auth-token']\n        // Successful login, return user data\n        msg.payload = {\n            msg:\"Admin Login Successfully\",\n            data: response.data.data.login,\n            token:token\n        };\n        msg.statusCode = 200; // OK\n    }\n} \n// Handle error in axios request\n    catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 515,
+        "y": 3940,
+        "wires": [
+            [
+                "508c065dd707daa6",
+                "fd442b9698954b56"
+            ]
+        ]
+    },
+    {
+        "id": "4c842a65a7cd01eb",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/v1/customerRegister",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 240,
+        "y": 4120,
+        "wires": [
+            [
+                "0e31975f1428a42e"
+            ]
+        ]
+    },
+    {
+        "id": "fd6882f6e98bd07f",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 730,
+        "y": 4080,
+        "wires": []
+    },
+    {
+        "id": "36120cade6aeacfe",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 246",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 4120,
+        "wires": []
+    },
+    {
+        "id": "ca702b9fb63fb1d9",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Customer Register",
+        "info": "",
+        "x": 210,
+        "y": 4060,
+        "wires": []
+    },
+    {
+        "id": "0e31975f1428a42e",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 201",
+        "func": "const userData = msg.req.body;\nconst apiURL = env.get(\"baseUrl\");\nconsole.log(userData)\n// Check if both email and password are provided\nconst requiredFields = ['emailAddress', 'firstName', 'lastName', 'title', 'password'];\nfor (const field of requiredFields) {\n    if (!userData[field]) {\n        msg.payload = {\n            error: `${field} is required`\n        };\n        msg.statusCode = 400; // Bad Request\n        return msg;\n    }\n}\n\n// Construct the GraphQL mutation payload\nconst payload = {\n    query: `\n    mutation RegisterCustomerAccount ($title:String, $firstName:String!, $lastName:String!, $phoneNumber:String!, $emailAddress:String!, $password:String!){\n       registerCustomerAccount(\n        input: {\n            title:$title\n            firstName:$firstName\n            lastName:$lastName\n            phoneNumber:$phoneNumber\n            emailAddress:$emailAddress\n            password:$password\n        }\n    ) {\n        ... on Success {\n            success\n        }\n        ... on MissingPasswordError {\n            errorCode\n            message\n        }\n        ... on PasswordValidationError {\n            errorCode\n            message\n            validationErrorMessage\n        }\n        ... on NativeAuthStrategyError {\n            errorCode\n            message\n        }\n    }\n}\n    `,\n    variables: {\n        emailAddress: userData.emailAddress,\n        firstName: userData.firstName,\n        lastName: userData.lastName,\n        title: userData.title,\n        phoneNumber: userData.phoneNumber,\n        password: userData.password\n    }\n};\n\ntry {\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json',\n        }\n    });\n\n    console.log(response.data.errors);\n\n    if (response.data.errors) {\n        // Handle GraphQL errors\n        const errorCode = response.data.errors[0].extensions.code;\n        const errorMessage = response.data.errors[0].message;\n\n        // Handle different error cases\n        if (errorCode === 'NOT_VERIFIED_ERROR') {\n            msg.payload = {\n                errorCode,\n                message: errorMessage\n            };\n            msg.statusCode = 401; // Unauthorized\n        } else if (errorCode === 'INVALID_CREDENTIALS_ERROR') {\n            msg.payload = {\n                error: \"Login Failed !\",\n                message: \"Invalid username or password\",\n            };\n            msg.statusCode = 401; // Unauthorized\n        } else {\n            // Handle other GraphQL errors\n            msg.payload = {\n                error: errorMessage\n            };\n            msg.statusCode = 400; // Bad Request\n        }\n    } else {\n        // Successful registration\n        msg.payload = {\n            message: \"User registered successfully\",\n            data: response.data.data.registerCustomerAccount\n        };\n        msg.statusCode = 200; // OK\n    }\n} catch (error) {\n    console.error(error);\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 510,
+        "y": 4120,
+        "wires": [
+            [
+                "fd6882f6e98bd07f",
+                "36120cade6aeacfe"
+            ]
+        ]
+    },
+    {
+        "id": "86e886230de60442",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 202",
+        "func": "const userData = msg.req.body;\nconst apiURL = env.get(\"baseUrl\");\n\n// Check if both username and password are provided\n// if (!userData.username || !userData.password) {\n//     msg.payload = {\n//         error: \"Username and password are required\"\n//     };\n//     msg.statusCode = 400; // Bad Request\n//     return msg;\n// }\nconst requiredFields = ['username', 'password'];\nfor (const field of requiredFields) {\n    if (!userData[field]) {\n        msg.payload = {\n            error: `${field} is required`\n        };\n        msg.statusCode = 400; // Bad Request\n        return msg;\n    }\n}\n// Construct the GraphQL mutation payload\nconst payload = {\n    query: `\n        mutation Login ($username:String!,$password:String!){\n            login(username:$username,password: $password) {\n                ... on CurrentUser {\n                    id\n                    identifier\n                }\n                ... on InvalidCredentialsError {\n                    errorCode\n                    message\n                    authenticationError\n                }\n                ... on NotVerifiedError {\n                    errorCode\n                    message\n                }\n            }\n        }\n    `,\n    variables: {\n        \"username\": userData.username,\n        \"password\": userData.password\n    }\n};\n\ntry {\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json',\n            data:msg.headers\n        }\n    });\n\n    console.log(response.data);\n\n    // Check the response for different error codes\n    if (response.data.data.login.errorCode) {\n        const errorCode = response.data.data.login.errorCode;\n        const errorMessage = response.data.data.login.message;\n\n        // Handle different error cases\n        if (errorCode === 'NOT_VERIFIED_ERROR') {\n            msg.payload = {\n                errorCode,\n                message: errorMessage\n            };\n            msg.statusCode = 401; // Unauthorized\n        } else if (errorCode === 'INVALID_CREDENTIALS_ERROR') {\n            msg.payload = {\n                errorCode,\n                error: \"Login Failed !\",\n                message: \"Invalid Username or Password\",\n            };\n            msg.statusCode = 401; // Unauthorized\n        }\n    } else {\n        // Successful login, return user data and token from headers\n        const token = response.headers[\"vendure-auth-token\"]; // Assuming the token is in the 'Authorization' header\n        // console.log(token)\n        msg.payload = {\n            msg: \"User Login Successfully\",\n            data: response.data.data.login,\n            token: token // Add the token to the response payload\n        };\n        msg.statusCode = 200; // OK\n    }\n} catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 510,
+        "y": 3780,
+        "wires": [
+            [
+                "17fd32afce4f83c5",
+                "32c30e4681086703"
+            ]
+        ]
+    },
+    {
+        "id": "e63c5957d3abd9c7",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 203",
+        "func": "const userData = msg.req.body;\nconst apiURL = env.get(\"shopUrl\");\n\n// Check if all required fields are provided\nconst requiredFields = ['emailAddress', 'firstName', 'lastName', 'title', 'password'];\nfor (const field of requiredFields) {\n    if (!userData[field]) {\n        msg.payload = {\n            error: `${field} is required`\n        };\n        msg.statusCode = 400; // Bad Request\n        return msg;\n    }\n}\n\nconst payload = {\n    query: `\n    mutation RegisterCustomerAccount (\n        $title: String,\n        $firstName: String!,\n        $lastName: String!,\n        $phoneNumber: String!,\n        $emailAddress: String!,\n        $password: String!\n    ) {\n        registerCustomerAccount(input: {\n            title: $title,\n            firstName: $firstName,\n            lastName: $lastName,\n            phoneNumber: $phoneNumber,\n            emailAddress: $email,\n            password: $password\n        }) {\n            ... on Success {\n                success\n            }\n            ... on MissingPasswordError {\n                errorCode\n                message\n            }\n            ... on PasswordValidationError {\n                errorCode\n                message\n                validationErrorMessage\n            }\n            ... on NativeAuthStrategyError {\n                errorCode\n                message\n            }\n        }\n    }`,\n    variables: {\n        emailAddress: userData.email,\n        firstName: userData.firstName,\n        lastName: userData.lastName,\n        title: userData.title,\n        phoneNumber: userData.phoneNumber, // Assuming phoneNumber is required\n        password: userData.password\n    }\n};\n\ntry {\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json',\n        }\n    });\n\n    const responseData = response.data.data.registerCustomerAccount;\n\n    // Check if there are any errors in the response\n    if (responseData && responseData.errorCode) {\n        // Handle different error cases\n        switch (responseData.errorCode) {\n            case 'DUPLICATE_USER_ERROR':\n                msg.payload = {\n                    error: \"User already exists with the provided email address\",\n                    errorCode: responseData.errorCode\n                };\n                msg.statusCode = 409; // Conflict\n                break;\n            // Handle other error cases similarly\n            default:\n                msg.payload = {\n                    error: \"An error occurred during registration\",\n                    errorCode: responseData.errorCode,\n                    message: responseData.message\n                };\n                msg.statusCode = 400; // Bad Request\n        }\n    } else {\n        // Successful registration\n        msg.payload = {\n            message: \"User registered successfully\",\n            data: responseData\n        };\n        msg.statusCode = 200; // OK\n    }\n} catch (error) {\n    console.error(error);\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 470,
+        "y": 4060,
+        "wires": [
+            [
+                "fd6882f6e98bd07f",
+                "36120cade6aeacfe"
+            ]
+        ]
+    },
+    {
+        "id": "2689bf5eb9465e86",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/api/customerInfo",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 230,
+        "y": 4300,
+        "wires": [
+            [
+                "8b137637efb5593f"
+            ]
+        ]
+    },
+    {
+        "id": "40ae987f8a87a9a9",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 730,
+        "y": 4260,
+        "wires": []
+    },
+    {
+        "id": "06ea9215f633b0b8",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 247",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 4300,
+        "wires": []
+    },
+    {
+        "id": "68b48198a4a5eead",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Get Customer Info",
+        "info": "",
+        "x": 210,
+        "y": 4240,
+        "wires": []
+    },
+    {
+        "id": "8b137637efb5593f",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 204",
+        "func": "\nconst apiURL = env.get(\"baseUrl\");\nconst token = msg.req.headers.token; // Assuming the token is passed as a parameter named 'token'\n// Check if token is provided\nif (!token) {\n    msg.payload = {\n        error: \"Token is required\"\n    };\n    msg.statusCode = 401; // Unauthorized\n    return msg;\n}\n\n// Construct the GraphQL query payload to retrieve active customer information\nconst payload = {\n    query: `\n        query ActiveCustomer {\n            activeCustomer {\n                id\n                firstName\n                lastName\n                phoneNumber\n                emailAddress\n                customFields\n            }\n        }\n    `,\n};\n\ntry {\n\n    // Token is valid, proceed with GraphQL request\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json',\n            'Authorization': `Bearer ${token}`, // Assuming the token follows the Bearer token format\n        }\n    });\n\n    console.log(response.data);\n\n    // Check if the response contains errors\n    if (response.data.errors) {\n        // Handle GraphQL errors\n        const errorMessage = response.data.errors[0].message;\n        msg.payload = {\n            error: errorMessage\n        };\n        msg.statusCode = 400; // Bad Request\n    } else {\n        // Check if the user data is null\n        const userData = response.data.data.activeCustomer;\n        if (!userData) {\n            // If userData is null, it indicates an issue with the token or authentication\n            msg.payload = {\n                error: \"Invalid token or authentication issue\"\n            };\n            msg.statusCode = 401; // Unauthorized\n        } else {\n            // Retrieve user information from the response data\n            msg.payload = {\n                msg: \"User Info Retrieved Successfully\",\n                data: userData\n            };\n            msg.statusCode = 200; // OK\n        }\n    }\n} catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 490,
+        "y": 4300,
+        "wires": [
+            [
+                "40ae987f8a87a9a9",
+                "06ea9215f633b0b8"
+            ]
+        ]
+    },
+    {
+        "id": "257d48421adad35d",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/v1/order",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 200,
+        "y": 4460,
+        "wires": [
+            [
+                "c9eda85c736ef65a"
+            ]
+        ]
+    },
+    {
+        "id": "921b431cad31d42e",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 699.1111145019531,
+        "y": 4432.222229003906,
+        "wires": []
+    },
+    {
+        "id": "6bfd3f275c7e908b",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 248",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 799.1111145019531,
+        "y": 4472.222229003906,
+        "wires": []
+    },
+    {
+        "id": "b2f49614af1c383d",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Get Customer Order",
+        "info": "",
+        "x": 219.11111450195312,
+        "y": 4412.222229003906,
+        "wires": []
+    },
+    {
+        "id": "c9eda85c736ef65a",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 205",
+        "func": "const apiURL = env.get(\"baseUrl\");\nconst token = msg.req.headers.token; // Assuming the token is passed as a parameter named 'token'\n// Check if token is provided\nif (!token) {\n    msg.payload = {\n        error: \"Token is required\"\n    };\n    msg.statusCode = 401; // Unauthorized\n    return msg;\n}\n\n// Construct the GraphQL query payload to retrieve active customer information\nconst payload = {\n    query: \n    `query ActiveCustomer {\n    activeCustomer {\n        orders {\n            items {\n                id\n                shippingAddress {\n                    fullName\n                    streetLine1\n                    streetLine2\n                    city\n                    province\n                    postalCode\n                    country\n                    phoneNumber\n                    countryCode\n                    customFields\n                }\n                billingAddress {\n                    company\n                    streetLine1\n                    streetLine2\n                    city\n                    province\n                    postalCode\n                    country\n                    phoneNumber\n                    countryCode\n                }\n                lines {\n                    productVariant {\n                        product {\n                            id\n                            name\n                            slug\n                            description\n                            customFields\n                            assets {\n                                id\n                                type\n                                preview\n                                customFields\n                                name\n                                source\n                            }\n                        }\n                    }\n                    linePrice\n                    id\n                    order {\n                        id\n                        active\n                        couponCodes\n                        totalQuantity\n                        subTotal\n                        subTotalWithTax\n                        currencyCode\n                        shipping\n                        total\n                        totalWithTax\n                        customFields\n                        payments {\n                            id\n                            method\n                            amount\n                            transactionId\n                            errorMessage\n                            metadata\n                        }\n                        fulfillments {\n                            id\n                            method\n                            trackingCode\n                            customFields\n                        }\n                    }\n                }\n                fulfillments {\n                    id\n                    state\n                    method\n                    trackingCode\n                    customFields\n                    lines {\n                        orderLineId\n                        quantity\n                        fulfillmentId\n                        fulfillment {\n                            id\n                            state\n                            method\n                            trackingCode\n                            customFields\n                            lines {\n                                orderLineId\n                                quantity\n                                fulfillmentId\n                            }\n                        }\n                    }\n                }\n            }\n        }\n    }\n}\n\n\n\n`\n}\ntry {\n    // Token is valid, proceed with GraphQL request\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json',\n            'Authorization': `Bearer ${token}`, // Assuming the token follows the Bearer token format\n        }\n    });\n\n    console.log(response.data);\n\n    // Check if the response contains errors\n    if (response.data.errors) {\n        // Handle GraphQL errors\n        const errorMessage = response.data.errors[0].message;\n        msg.payload = {\n            error: errorMessage\n        };\n        msg.statusCode = 400; // Bad Request\n    } else {\n        // Check if order data is null\n        if (!response.data.data.activeCustomer.orders || !response.data.data.activeCustomer.orders.items) {\n            msg.payload = {\n                error: \"No order found\"\n            };\n            msg.statusCode = 404; // Not Found\n        } else {\n            // Retrieve user order information from the response data\n            msg.payload = {\n                msg: \"User Order Data Retrieved Successfully\",\n                data: response.data.data.activeCustomer.orders.items\n            };\n            msg.statusCode = 200; // OK\n        }\n    }\n} catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 490,
+        "y": 4460,
+        "wires": [
+            [
+                "921b431cad31d42e",
+                "6bfd3f275c7e908b"
+            ]
+        ]
+    },
+    {
+        "id": "548107aac6b061d4",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/v1/products",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 210,
+        "y": 4680,
+        "wires": [
+            [
+                "c1e818d0bd3e2c81"
+            ]
+        ]
+    },
+    {
+        "id": "36545e65870f0561",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 692.2222290039062,
+        "y": 4657.555480957031,
+        "wires": []
+    },
+    {
+        "id": "0cca4517f3176303",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 249",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 812.2222290039062,
+        "y": 4697.555480957031,
+        "wires": []
+    },
+    {
+        "id": "87c4863f88f64c29",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Get All Products",
+        "info": "",
+        "x": 180,
+        "y": 4620,
+        "wires": []
+    },
+    {
+        "id": "c1e818d0bd3e2c81",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 206",
+        "func": "\nconst apiURL = env.get(\"baseUrl\");\nconst payload = {\n    query: `\n       query Products {\n       products {\n        totalItems\n        items {\n            id\n            name\n            slug\n            description\n            customFields\n            featuredAsset {\n                id\n                source\n                preview\n                customFields\n            }\n            assets {\n                id\n                name\n                source\n                preview\n                customFields\n            }\n                featuredAsset {\n                    id\n                    name\n                    source\n                    preview\n                    customFields\n                    type\n                }\n\n            }\n        }\n    \n}\n\n    `,\n};\n\ntry {\n\n    // Token is valid, proceed with GraphQL request\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json'\n        }\n    });\n\n    console.log(response.data);\n\n    // Check if the response contains errors\n    if (response.data.errors) {\n        // Handle GraphQL errors\n        const errorMessage = response.data.errors[0].message;\n        msg.payload = {\n            error: errorMessage\n        };\n        msg.statusCode = 400; // Bad Request\n    }\n    else {\n            // Retrieve user information from the response data\n            msg.payload = {\n                msg: \"Products fetched Successfully\",\n                data:response.data.data.products\n            };\n            msg.statusCode = 200; // OK\n        }\n    \n} catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 490,
+        "y": 4680,
+        "wires": [
+            [
+                "36545e65870f0561",
+                "0cca4517f3176303"
+            ]
+        ]
+    },
+    {
+        "id": "d80b4a2b09b6c1c5",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 207",
+        "func": "// const  id= msg.req.params.id;\n// if (!id) {\n//     // If the slug parameter is missing, return an error response\n//     return {\n//         error: \"Product id is Required\",\n//         statusCode: 400 // Bad Request\n//     };\n// }\n// const apiURL = env.get(\"baseUrl\");\n// const payload = {\n//     query: `\n//        query Product($id:ID!) {\n//             product(id:$id) {\n//                 id\n//                 name\n//                 slug\n//                 description\n//                 customFields\n//                 featuredAsset {\n//                         id\n//                         name\n//                         preview\n//                         source\n//                     }\n//                 assets {\n//                     id\n//                     name\n//                     source\n//                     customFields\n//                     preview\n//                 }\n//                 variants {\n//                         id\n//                         productId\n//                         sku\n//                         name\n//                         price\n//                         currencyCode\n//                         priceWithTax\n//                         stockLevel\n//                         customFields\n//                     }\n//             }\n//         }\n//     `,\n//     variables:{\n//         id:id\n//     }\n   \n// };\n\n// try {\n\n//     // Token is valid, proceed with GraphQL request\n//     const response = await axios.post(apiURL, JSON.stringify(payload), {\n//         headers: {\n//             'Content-Type': 'application/json'\n//         }\n//     });\n\n//     console.log(response.data);\n\n//     // Check if the response contains errors\n//     if (response.data.errors) {\n//         // Handle GraphQL errors\n//         const errorMessage = response.data.errors[0].message;\n//         msg.payload = {\n//             error: errorMessage\n//         };\n//         msg.statusCode = 400; // Bad Request\n//     }\n//     else {\n//             // Retrieve user information from the response data\n//             msg.payload = {\n//                 msg: \"Products fetched Successfully\",\n//                 data:response.data\n//             };\n//             msg.statusCode = 200; // OK\n//         }\n    \n// } catch (error) {\n//     console.error(error);\n//     // Handle error in axios request\n//     msg.payload = {\n//         error: \"An error occurred while processing the request\"\n//     };\n//     msg.statusCode = 500; // Internal Server Error\n// }\n\n// return msg;\n\nconst id = msg.req.params.id;\nif (!id) {\n    // If the slug parameter is missing, return an error response\n    return {\n        error: \"Product id is Required\",\n        statusCode: 400 // Bad Request\n    };\n}\n\nconst apiURL = env.get(\"baseUrl\");\nconst payload = {\n    query: `\n       query Product($id: ID!) {\n            product(id: $id) {\n                id\n                name\n                slug\n                description\n                customFields\n                featuredAsset {\n                    id\n                    name\n                    preview\n                    source\n                }\n                assets {\n                    id\n                    name\n                    source\n                    customFields\n                    preview\n                }\n                variants {\n                    id\n                    productId\n                    sku\n                    name\n                    price\n                    currencyCode\n                    priceWithTax\n                    stockLevel\n                    customFields\n                }\n            }\n        }\n    `,\n    variables: {\n        id: id\n    }\n};\n\ntry {\n    // Token is valid, proceed with GraphQL request\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json'\n        }\n    });\n\n    console.log(response.data);\n\n    // Check if the response contains errors\n    if (response.data.errors) {\n        // Handle GraphQL errors\n        const errorMessage = response.data.errors[0].message;\n        msg.payload = {\n            error: errorMessage\n        };\n        msg.statusCode = 400; // Bad Request\n    } else {\n        // Check if product is null\n        if (response.data.data.product === null) {\n            msg.payload = {\n                error: \"Product not found\"\n            };\n            msg.statusCode = 404; // Not Found\n        } else {\n            // Retrieve user information from the response data\n            msg.payload = {\n                msg: \"Products fetched Successfully\",\n                data: response.data\n            };\n            msg.statusCode = 200; // OK\n        }\n    }\n\n} catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 510,
+        "y": 4900,
+        "wires": [
+            [
+                "c64a36489f6ac31e",
+                "d45d0bd8c8dc228f"
+            ]
+        ]
+    },
+    {
+        "id": "d4399e16b00830b1",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/v1/products/:id",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 240,
+        "y": 4900,
+        "wires": [
+            [
+                "d80b4a2b09b6c1c5"
+            ]
+        ]
+    },
+    {
+        "id": "c64a36489f6ac31e",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 712.2222290039062,
+        "y": 4877.555480957031,
+        "wires": []
+    },
+    {
+        "id": "d45d0bd8c8dc228f",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 250",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 832.2222290039062,
+        "y": 4917.555480957031,
+        "wires": []
+    },
+    {
+        "id": "9d7c2290ce9c40e3",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Get Customer Order",
+        "info": "",
+        "x": 272.22222900390625,
+        "y": 4857.555480957031,
+        "wires": []
+    },
+    {
+        "id": "0b23ba2466c909d8",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 208",
+        "func": "const apiURL = env.get(\"baseUrl\");\nconst payload = {\n    query: `\n    //    query Collections {\n    //     collections {\n    //         items {\n    //             id\n    //             name\n    //             slug\n    //             featuredAsset {\n    //                 id\n    //                 source\n    //                 preview\n    //             }\n    //             children {\n    //                 id\n    //                 name\n    //                 children {\n    //                     id\n    //                     name\n    //                 }\n    //             }\n    //         }\n    //     }\n    // }\n            query Collections {\n            collections {\n                items {\n                    id\n                    name\n                    slug\n                    featuredAsset {\n                        id\n                        source\n                        preview\n                    }\n                    children {\n                        id\n                        name\n                        children {\n                            id\n                            name\n                        }\n                    }\n                    parent {\n                        id\n                        name\n                    }\n                }\n            }\n        }\n\n    `\n   \n};\n\ntry {\n\n    // Token is valid, proceed with GraphQL request\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json'\n        }\n    });\n\n    console.log(response.data);\n\n    // Check if the response contains errors\n    if (response.data.errors) {\n        // Handle GraphQL errors\n        const errorMessage = response.data.errors[0].message;\n        msg.payload = {\n            error: errorMessage\n        };\n        msg.statusCode = 400; // Bad Request\n    }\n    else {\n            // Retrieve user information from the response data\n            msg.payload = {\n                msg: \"Collection fetch Successfully\",\n                data:response.data.data\n            };\n            msg.statusCode = 200; // OK\n        }\n    \n} catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 490,
+        "y": 5160,
+        "wires": [
+            [
+                "3f748def324237be",
+                "c885f2605020cd84"
+            ]
+        ]
+    },
+    {
+        "id": "c5efbfba67eca5aa",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/v1/collections",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 220,
+        "y": 5160,
+        "wires": [
+            [
+                "0b23ba2466c909d8"
+            ]
+        ]
+    },
+    {
+        "id": "3f748def324237be",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 692.2222290039062,
+        "y": 5137.555480957031,
+        "wires": []
+    },
+    {
+        "id": "c885f2605020cd84",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 251",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 812.2222290039062,
+        "y": 5177.555480957031,
+        "wires": []
+    },
+    {
+        "id": "b46966c0bf4b0a15",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Get All Collections",
+        "info": "",
+        "x": 252.22222900390625,
+        "y": 5117.555480957031,
+        "wires": []
+    },
+    {
+        "id": "d29c0e818b0bc8f6",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 209",
+        "func": "const value=msg.req.params.collectionSlug\nconst apiURL = env.get(\"baseUrl\");\nconst payload = {\n    query: `\n       query Search ($collectionSlug:String!){\n        search(input: { collectionSlug:$collectionSlug }) {\n                items {\n                sku\n                slug\n                productId\n                productName\n                productAsset {\n                    id\n                    preview\n                }\n                price {\n                    ... on PriceRange {\n                        min\n                        max\n                    }\n                    ... on SinglePrice {\n                        value\n                    }\n                }\n                description\n                inStock\n            }\n            collections {\n                collection {\n                    breadcrumbs {\n                        id\n                        name\n                        slug\n                    }\n                }\n            }\n        }\n    }\n\n    `,\n    variables:{\n        collectionSlug:value\n    }\n   \n};\n\ntry {\n\n    // Token is valid, proceed with GraphQL request\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json'\n        }\n    });\n\n    console.log(response.data);\n\n    // Check if the response contains errors\n    if (response.data.errors) {\n        // Handle GraphQL errors\n        const errorMessage = response.data.errors[0].message;\n        msg.payload = {\n            error: errorMessage\n        };\n        msg.statusCode = 400; // Bad Request\n    }\n    else {\n            // Retrieve user information from the response data\n            msg.payload = {\n                msg: \"Product Search Successfully\",\n                data:response.data\n            };\n            msg.statusCode = 200; // OK\n        }\n    \n} catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 570,
+        "y": 5320,
+        "wires": [
+            [
+                "639b2247c2947053",
+                "a308e4364a369c30"
+            ]
+        ]
+    },
+    {
+        "id": "f2130c657721f704",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/v1/search/:collectionSlug",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 230,
+        "y": 5320,
+        "wires": [
+            [
+                "d29c0e818b0bc8f6"
+            ]
+        ]
+    },
+    {
+        "id": "639b2247c2947053",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 752.2222290039062,
+        "y": 5297.555480957031,
+        "wires": []
+    },
+    {
+        "id": "a308e4364a369c30",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 252",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 892.2222290039062,
+        "y": 5337.555480957031,
+        "wires": []
+    },
+    {
+        "id": "03d8f89f334e4a8d",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Search ",
+        "info": "",
+        "x": 170,
+        "y": 5260,
+        "wires": []
+    },
+    {
+        "id": "62988cf39940098b",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 210",
+        "func": "const value = msg.req.params.collectionSlug;\nconsole.log(value);\n\nif (!value) {\n    // If the slug parameter is missing, return an error response\n    return {\n        error: \"Collection slug is missing\",\n        statusCode: 400 // Bad Request\n    };\n}\n\nconst apiURL = env.get(\"baseUrl\");\nconst payload = {\n    query: `\n       query Collection($slug:String!) {\n            collection(slug:$slug) {\n                id\n                name\n                featuredAsset {\n                    id\n                    name\n                    source\n                    preview\n                }\n                children {\n                    id\n                    name\n                    slug\n                    description\n                    featuredAsset {\n                        id\n                        preview\n                        source\n                    }\n                    assets {\n                        id\n                        name\n                        source\n                        preview\n                    }\n                    breadcrumbs {\n                        id\n                        name\n                        slug\n                    }\n                }\n            }\n        }\n    `,\n    variables:{\n        slug:value\n    }\n};\n\ntry {\n\n    // Token is valid, proceed with GraphQL request\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json'\n        }\n    });\n\n    console.log(response.data);\n\n    // Check if the response contains errors\n    if (response.data.errors) {\n        // Handle GraphQL errors\n        const errorMessage = response.data.errors[0].message;\n        msg.payload = {\n            error: \"Slug either Invalid or not Provided\"\n        };\n        msg.statusCode = 400; // Bad Request\n    }\n    else {\n            // Retrieve user information from the response data\n            msg.payload = {\n                msg: \"Product by Collection Successfully\",\n                data:response.data\n            };\n            msg.statusCode = 200; // OK\n        }\n    \n} catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 550,
+        "y": 5500,
+        "wires": [
+            [
+                "f7f77decd3ea0b3c",
+                "b759746771aae545"
+            ]
+        ]
+    },
+    {
+        "id": "b42c184441d24591",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/api/collection/:collectionSlug",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 240,
+        "y": 5500,
+        "wires": [
+            [
+                "62988cf39940098b"
+            ]
+        ]
+    },
+    {
+        "id": "f7f77decd3ea0b3c",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 732.2222290039062,
+        "y": 5477.555480957031,
+        "wires": []
+    },
+    {
+        "id": "b759746771aae545",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 253",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 872.2222290039062,
+        "y": 5517.555480957031,
+        "wires": []
+    },
+    {
+        "id": "318fb40add42279c",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Get Product by Collection",
+        "info": "",
+        "x": 230,
+        "y": 5460,
+        "wires": []
+    },
+    {
+        "id": "7e8310be7c11c498",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 211",
+        "func": "const value = msg.req.params.collectionSlug;\nconsole.log(value);\n\nif (!value) {\n    // If the slug parameter is missing, return an error response\n    return {\n        error: \"Collection slug is missing\",\n        statusCode: 400 // Bad Request\n    };\n}\n\nconst apiURL = env.get(\"baseUrl\");\nconst payload = {\n    query: `\n       query Collection($slug:String!) {\n       collection(slug:$slug) {\n        id\n        name\n        slug\n        description\n        parentId\n        customFields\n        children {\n            id\n            name\n            slug\n            description\n            parentId\n            customFields\n            translations {\n                id\n                name\n                slug\n                description\n            }\n            productVariants {\n                totalItems\n                items {\n                    id\n                    sku\n                    name\n                    price\n                    currencyCode\n                    priceWithTax\n                    stockLevel\n                    customFields\n                    productId\n                    assets {\n                        id\n                        source\n                        preview\n                        customFields\n                        name\n                    }\n                }\n            }\n        }\n    }\n}\n\n    `,\n    variables:{\n        slug:value\n    }\n};\n\ntry {\n\n    // Token is valid, proceed with GraphQL request\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json'\n        }\n    });\n\n    console.log(response.data);\n\n    // Check if the response contains errors\n    if (response.data.errors) {\n        // Handle GraphQL errors\n        const errorMessage = response.data.errors[0].message;\n        msg.payload = {\n            error: \"Slug either Invalid or not Provided\"\n        };\n        msg.statusCode = 400; // Bad Request\n    }\n    else {\n            // Retrieve user information from the response data\n            msg.payload = {\n                msg: \"Product by Collection Successfully\",\n                data:response.data\n            };\n            msg.statusCode = 200; // OK\n        }\n    \n} catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 550,
+        "y": 5680,
+        "wires": [
+            [
+                "eaab4c3643a25ce8",
+                "5f9412688590d86f"
+            ]
+        ]
+    },
+    {
+        "id": "e984218fced13564",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/v1/collectionTree/:collectionSlug",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 250,
+        "y": 5680,
+        "wires": [
+            [
+                "7e8310be7c11c498"
+            ]
+        ]
+    },
+    {
+        "id": "eaab4c3643a25ce8",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 732.2222290039062,
+        "y": 5657.555480957031,
+        "wires": []
+    },
+    {
+        "id": "5f9412688590d86f",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 254",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 872.2222290039062,
+        "y": 5697.555480957031,
+        "wires": []
+    },
+    {
+        "id": "9d79af0277fd2601",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Get Product Collection Tree",
+        "info": "",
+        "x": 240,
+        "y": 5640,
+        "wires": []
+    },
+    {
+        "id": "9a1777f836439f1e",
+        "type": "http in",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "url": "/vendure/v1/order",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 220,
+        "y": 5920,
+        "wires": [
+            [
+                "e15318a9131b0b74"
+            ]
+        ]
+    },
+    {
+        "id": "28531501dde6dc79",
+        "type": "http response",
+        "z": "dbfdd28e.d60f",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 750,
+        "y": 5940,
+        "wires": []
+    },
+    {
+        "id": "9b83d8070c7ac3a8",
+        "type": "debug",
+        "z": "dbfdd28e.d60f",
+        "name": "debug 255",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 750,
+        "y": 5880,
+        "wires": []
+    },
+    {
+        "id": "542e283d6bf9a06c",
+        "type": "comment",
+        "z": "dbfdd28e.d60f",
+        "name": "Placed customer Order",
+        "info": "",
+        "x": 249.11111450195312,
+        "y": 5872.222229003906,
+        "wires": []
+    },
+    {
+        "id": "e15318a9131b0b74",
+        "type": "function",
+        "z": "dbfdd28e.d60f",
+        "name": "function 212",
+        "func": "const userData = msg.req.body;\nconsole.log(userData)\nconst apiURL = env.get(\"baseUrl\");\nconst token = msg.req.headers.token;\nif (!userData.variantID || !userData.quantity) {\n    msg.payload={\n        error:\"VariantID and Quantity is Required\"\n    }\n    console.error(\"Error: variantID and quantity are required.\");\n    msg.statusCode = 400; // Set status code to indicate bad request\n    return msg; // Return early if validation fails\n}\n// Construct the GraphQL query payload to retrieve active customer information\nconst payload = {\n    query: `mutation AddItemToOrder($variantID:ID!,$quantity:Int!) {\n    addItemToOrder(productVariantId:$variantID, quantity:$quantity) {\n        ... on Order {\n            id\n            type\n            orderPlacedAt\n            state\n            active\n            couponCodes\n            totalQuantity\n            subTotal\n            subTotalWithTax\n            currencyCode\n            shipping\n            shippingWithTax\n            total\n            totalWithTax\n            customFields\n            shippingAddress {\n                fullName\n                company\n                streetLine1\n                streetLine2\n                city\n                province\n                postalCode\n                country\n                countryCode\n                phoneNumber\n                customFields\n            }\n            billingAddress {\n                fullName\n                company\n                streetLine1\n                streetLine2\n                city\n                province\n                postalCode\n                country\n                countryCode\n                phoneNumber\n                customFields\n            }\n        }\n    }\n}\n\n`,\nvariables:{\n    variantID:userData.variantID,\n    quantity:userData.quantity\n}\n};\n\ntry {\n\n    // Token is valid, proceed with GraphQL request\n    const response = await axios.post(apiURL, JSON.stringify(payload), {\n        headers: {\n            'Content-Type': 'application/json',\n            'Authorization': `Bearer ${token}`, // Assuming the token follows the Bearer token format\n        }\n    });\n\n    console.log(response.data);\n    if (response.data.errors) {\n        // Handle GraphQL errors\n        const errorMessage = response.data.errors[0].message;\n        msg.payload = {\n            error: errorMessage\n        };\n        msg.statusCode = 400; // Bad Request\n    }\n     else {\n            // Retrieve user information from the response data\n            msg.payload = {\n                msg: \"Order Placed Successfully\",\n                data:response.data\n            };\n            msg.statusCode = 200; // OK\n        }\n} catch (error) {\n    console.error(error);\n    // Handle error in axios request\n    msg.payload = {\n        error: \"An error occurred while processing the request\"\n    };\n    msg.statusCode = 500; // Internal Server Error\n}\n\n\nreturn msg;\n\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "axios",
+                "module": "axios"
+            }
+        ],
+        "x": 450,
+        "y": 5920,
+        "wires": [
+            [
+                "9b83d8070c7ac3a8",
+                "28531501dde6dc79"
+            ]
+        ]
+    }
+]

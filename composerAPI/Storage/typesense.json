@@ -1,0 +1,1917 @@
+[
+    {
+        "id": "aadd0e98776b9265",
+        "type": "tab",
+        "label": "UC01-CommerceTools",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "4e2e9c1842e0431a",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Create Cart",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar cartDetails = msg.payload;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.payload = cartDetails;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 220,
+        "wires": [
+            [
+                "6c51dcd780276a1f"
+            ]
+        ]
+    },
+    {
+        "id": "9a967866c9be3c1b",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/createCart",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 220,
+        "wires": [
+            [
+                "4e2e9c1842e0431a"
+            ]
+        ]
+    },
+    {
+        "id": "5e9192a44cfa07de",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "createCart",
+        "statusCode": "",
+        "headers": {},
+        "x": 730,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "6c51dcd780276a1f",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "createCart",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/carts",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 510,
+        "y": 220,
+        "wires": [
+            [
+                "5e9192a44cfa07de"
+            ]
+        ]
+    },
+    {
+        "id": "81fbdf15d277615a",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Login",
+        "func": "var granType = 'password';\nvar username = msg.req.params.username;\nvar password = msg.req.params.password;\nmsg.granType = granType;\nmsg.username = username;\nmsg.password = password;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 100,
+        "wires": [
+            [
+                "aedf7ec7f64a0114"
+            ]
+        ]
+    },
+    {
+        "id": "ae32761064d4327f",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "uc/login/:username/:password",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 100,
+        "wires": [
+            [
+                "81fbdf15d277615a"
+            ]
+        ]
+    },
+    {
+        "id": "77483582faf002b2",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "login",
+        "statusCode": "",
+        "headers": {},
+        "x": 870,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "aedf7ec7f64a0114",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "login",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://auth.australia-southeast1.gcp.commercetools.com/oauth/projectsunrise_demo/customers/token?grant_type={{{granType}}}&username={{{username}}}&password={{{password}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 670,
+        "y": 100,
+        "wires": [
+            [
+                "77483582faf002b2"
+            ]
+        ]
+    },
+    {
+        "id": "abda015c9cea19d0",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "setOAuthPayload",
+        "func": "var granType = 'client_credentials';\nmsg.granType = granType;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 40,
+        "wires": [
+            [
+                "e7aab0cacedfdd5b"
+            ]
+        ]
+    },
+    {
+        "id": "06e5bfe50f922ff9",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/createOAuthToken",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 40,
+        "wires": [
+            [
+                "abda015c9cea19d0"
+            ]
+        ]
+    },
+    {
+        "id": "a80c759ea2a0b403",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "createOAuthToken",
+        "statusCode": "",
+        "headers": {},
+        "x": 810,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "e7aab0cacedfdd5b",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "createOAuthToken",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://auth.australia-southeast1.gcp.commercetools.com/oauth/token?grant_type={{{granType}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "basic",
+        "senderr": false,
+        "headers": [],
+        "x": 610,
+        "y": 40,
+        "wires": [
+            [
+                "a80c759ea2a0b403"
+            ]
+        ]
+    },
+    {
+        "id": "a07839b0a4f50de2",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "SignUp",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar customerDetails = msg.payload;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.payload = customerDetails;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 160,
+        "wires": [
+            [
+                "279d7e8d0d0f08e3"
+            ]
+        ]
+    },
+    {
+        "id": "463c4bb30ab1803b",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "uc/signUpNewUser",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 160,
+        "wires": [
+            [
+                "a07839b0a4f50de2"
+            ]
+        ]
+    },
+    {
+        "id": "20839104cf6429cf",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "createCustomer",
+        "statusCode": "",
+        "headers": {},
+        "x": 740,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "279d7e8d0d0f08e3",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "createCustomer",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/customers",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 540,
+        "y": 160,
+        "wires": [
+            [
+                "20839104cf6429cf"
+            ]
+        ]
+    },
+    {
+        "id": "c9b08e5b0521ec87",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get Cart",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar cartID = msg.req.params.Id ;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.cartID = cartID;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 280,
+        "wires": [
+            [
+                "d237460a4879b63b"
+            ]
+        ]
+    },
+    {
+        "id": "4f5f91eca0dad591",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "uc/getCart/:Id",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 280,
+        "wires": [
+            [
+                "c9b08e5b0521ec87"
+            ]
+        ]
+    },
+    {
+        "id": "3ee6c91caee85ff0",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "getCart",
+        "statusCode": "",
+        "headers": {},
+        "x": 720,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "d237460a4879b63b",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "getCart",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/carts/{{{cartID}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 500,
+        "y": 280,
+        "wires": [
+            [
+                "3ee6c91caee85ff0"
+            ]
+        ]
+    },
+    {
+        "id": "cfbadc7f8771fafb",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Delete Cart",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar cartID = msg.req.params.Id;\nvar cartVersion = msg.req.params.version;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.cartID = cartID;\nmsg.cartVersion = cartVersion;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 340,
+        "wires": [
+            [
+                "3e64cce4c6aeeb5f"
+            ]
+        ]
+    },
+    {
+        "id": "308464f4612b4598",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/deleteCart/:Id/:version",
+        "method": "delete",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 340,
+        "wires": [
+            [
+                "cfbadc7f8771fafb"
+            ]
+        ]
+    },
+    {
+        "id": "b2dbaa4622e07c77",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "deleteCart",
+        "statusCode": "",
+        "headers": {},
+        "x": 750,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "3e64cce4c6aeeb5f",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "deleteCart",
+        "method": "DELETE",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/carts/{{{cartID}}}?version={{{cartVersion}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 570,
+        "y": 340,
+        "wires": [
+            [
+                "b2dbaa4622e07c77"
+            ]
+        ]
+    },
+    {
+        "id": "c58a0beb3451e090",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Add Item to Cart",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar cartID = msg.req.params.Id;\nvar cartDetails = msg.payload;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.cartID = cartID;\nmsg.payload = cartDetails;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 400,
+        "wires": [
+            [
+                "9d8c4a5b6ed1a4fc"
+            ]
+        ]
+    },
+    {
+        "id": "12bd7c82079f1101",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "uc/addItemToCart/:Id",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 400,
+        "wires": [
+            [
+                "c58a0beb3451e090"
+            ]
+        ]
+    },
+    {
+        "id": "7564427cfe603e8b",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "AddItem",
+        "statusCode": "",
+        "headers": {},
+        "x": 900,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "9d8c4a5b6ed1a4fc",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "AddItem",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/carts/{{{cartID}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 740,
+        "y": 400,
+        "wires": [
+            [
+                "7564427cfe603e8b"
+            ]
+        ]
+    },
+    {
+        "id": "e2b433915ee052eb",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Update Cart Item",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar cartID = msg.req.params.Id;\nvar cartDetails = msg.payload;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.cartID = cartID;\nmsg.payload = cartDetails;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 460,
+        "wires": [
+            [
+                "6af501efd419aa75"
+            ]
+        ]
+    },
+    {
+        "id": "fb19a1e7c4282271",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "uc/updateCartItem/:Id",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 460,
+        "wires": [
+            [
+                "e2b433915ee052eb"
+            ]
+        ]
+    },
+    {
+        "id": "d0084fa1239fc5b1",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "UpdateCartItem",
+        "statusCode": "",
+        "headers": {},
+        "x": 780,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "6af501efd419aa75",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "UpdateCartItem",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/carts/{{{cartID}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 580,
+        "y": 460,
+        "wires": [
+            [
+                "d0084fa1239fc5b1"
+            ]
+        ]
+    },
+    {
+        "id": "cf13e1436f91c979",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Delete Cart Item",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar cartID = msg.req.params.Id;\nvar cartDetails = msg.payload;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.cartID = cartID;\nmsg.payload = cartDetails;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 520,
+        "wires": [
+            [
+                "2a4f0b2afe0df296"
+            ]
+        ]
+    },
+    {
+        "id": "5ad6650cad9ec93f",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/deleteCartItem/:Id",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 520,
+        "wires": [
+            [
+                "cf13e1436f91c979"
+            ]
+        ]
+    },
+    {
+        "id": "e2246329769aa37a",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "DeleteCartItem",
+        "statusCode": "",
+        "headers": {},
+        "x": 780,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "2a4f0b2afe0df296",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "DeleteCartItem",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/carts/{{{cartID}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 580,
+        "y": 520,
+        "wires": [
+            [
+                "e2246329769aa37a"
+            ]
+        ]
+    },
+    {
+        "id": "d8c2593344e2ef75",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get All Categories",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 580,
+        "wires": [
+            [
+                "d337ae370dae632f"
+            ]
+        ]
+    },
+    {
+        "id": "84abee699f3daba9",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/getAllCategories",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 580,
+        "wires": [
+            [
+                "d8c2593344e2ef75"
+            ]
+        ]
+    },
+    {
+        "id": "2b8e9342f988706b",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "GetAllCategories",
+        "statusCode": "",
+        "headers": {},
+        "x": 790,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "d337ae370dae632f",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "GetAllCategories",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/categories",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 590,
+        "y": 580,
+        "wires": [
+            [
+                "2b8e9342f988706b"
+            ]
+        ]
+    },
+    {
+        "id": "241ac241c4c21424",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get A Category",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar cat_ID = msg.req.params.Id;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.cat_ID = cat_ID;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 640,
+        "wires": [
+            [
+                "f54d93f6190d8eba"
+            ]
+        ]
+    },
+    {
+        "id": "e8c7ed1f1f52fd98",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/getCategoryById/:Id",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 640,
+        "wires": [
+            [
+                "241ac241c4c21424"
+            ]
+        ]
+    },
+    {
+        "id": "d9708ed4eecab575",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "GetACategory",
+        "statusCode": "",
+        "headers": {},
+        "x": 780,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "f54d93f6190d8eba",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "GetACategory",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/categories/{{{cat_ID}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 580,
+        "y": 640,
+        "wires": [
+            [
+                "d9708ed4eecab575"
+            ]
+        ]
+    },
+    {
+        "id": "4caaf3c17a715189",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get All Products",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar limit = msg.req.params.limit;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.limit = limit;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 700,
+        "wires": [
+            [
+                "7bf66d8a52d7dae4"
+            ]
+        ]
+    },
+    {
+        "id": "499cc8e391b677a3",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/getAllProducts/:limit",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 700,
+        "wires": [
+            [
+                "4caaf3c17a715189"
+            ]
+        ]
+    },
+    {
+        "id": "0b3940b62954e286",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "GetAllProducts",
+        "statusCode": "",
+        "headers": {},
+        "x": 780,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "7bf66d8a52d7dae4",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "GetAllProducts",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/products?limit={{{limit}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 580,
+        "y": 700,
+        "wires": [
+            [
+                "0b3940b62954e286"
+            ]
+        ]
+    },
+    {
+        "id": "917c189da3f5feef",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get A Product",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar prod_ID = msg.req.params.Id;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.prod_ID = prod_ID;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 760,
+        "wires": [
+            [
+                "e1f89a5de9a10aa0"
+            ]
+        ]
+    },
+    {
+        "id": "853b1b96b295e064",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/getProductById/:Id",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 760,
+        "wires": [
+            [
+                "917c189da3f5feef"
+            ]
+        ]
+    },
+    {
+        "id": "fb6053142e6a8876",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "GetAProduct",
+        "statusCode": "",
+        "headers": {},
+        "x": 770,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "e1f89a5de9a10aa0",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "GetAProduct",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/products/{{{prod_ID}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 570,
+        "y": 760,
+        "wires": [
+            [
+                "fb6053142e6a8876"
+            ]
+        ]
+    },
+    {
+        "id": "715c3c28b9b2ea33",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get Customer",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 880,
+        "wires": [
+            [
+                "c8d02abdfe1d8dc1"
+            ]
+        ]
+    },
+    {
+        "id": "6b56b26af581c2ea",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/getCustomerDetails",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 880,
+        "wires": [
+            [
+                "715c3c28b9b2ea33"
+            ]
+        ]
+    },
+    {
+        "id": "ab3f0643486064f3",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "getCustomer",
+        "statusCode": "",
+        "headers": {},
+        "x": 710,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "c8d02abdfe1d8dc1",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "getCustomer",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/me?",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 510,
+        "y": 880,
+        "wires": [
+            [
+                "ab3f0643486064f3"
+            ]
+        ]
+    },
+    {
+        "id": "976f050446a9ae50",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get Order",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar order_no = msg.req.params.OrderNumber;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.order_no = order_no;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 940,
+        "wires": [
+            [
+                "e77107cec74ccbb3"
+            ]
+        ]
+    },
+    {
+        "id": "cd24b2d817e54e66",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/getOrder/:OrderNumber",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 940,
+        "wires": [
+            [
+                "976f050446a9ae50"
+            ]
+        ]
+    },
+    {
+        "id": "eaf54e0344ec4c2c",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "getOrder",
+        "statusCode": "",
+        "headers": {},
+        "x": 700,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "e77107cec74ccbb3",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "getOrder",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/orders/{{{order_no}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 500,
+        "y": 940,
+        "wires": [
+            [
+                "eaf54e0344ec4c2c"
+            ]
+        ]
+    },
+    {
+        "id": "3b9121bb82b2d831",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "CreateCutomerCart",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar cartID = msg.req.params.Id;\nvar cartDetails = msg.payload;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.cartID = cartID;\nmsg.payload = cartDetails;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 1080,
+        "wires": [
+            [
+                "36d093a8f8bcb806"
+            ]
+        ]
+    },
+    {
+        "id": "2c5e87cea47866e7",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/createCustomerCartAssociation/:Id",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 1080,
+        "wires": [
+            [
+                "3b9121bb82b2d831"
+            ]
+        ]
+    },
+    {
+        "id": "9b65fe17a652be36",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "CustomerCart",
+        "statusCode": "",
+        "headers": {},
+        "x": 820,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "36d093a8f8bcb806",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "CustomerCart",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/carts/{{{cartID}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 640,
+        "y": 1080,
+        "wires": [
+            [
+                "9b65fe17a652be36"
+            ]
+        ]
+    },
+    {
+        "id": "10ed8d619a1c9226",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get Customer Orders",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 1260,
+        "wires": [
+            [
+                "f81a2f89aeafb196"
+            ]
+        ]
+    },
+    {
+        "id": "5c10d86d815555bd",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/getOrdersByCustomer",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 140,
+        "y": 1260,
+        "wires": [
+            [
+                "10ed8d619a1c9226"
+            ]
+        ]
+    },
+    {
+        "id": "cd3ef9ff82677185",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "getCustomerOrders",
+        "statusCode": "",
+        "headers": {},
+        "x": 880,
+        "y": 1260,
+        "wires": []
+    },
+    {
+        "id": "f81a2f89aeafb196",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "getCustomerOrders",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/me/orders?",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 1260,
+        "wires": [
+            [
+                "cd3ef9ff82677185"
+            ]
+        ]
+    },
+    {
+        "id": "043777116511946a",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Set Shipping Address",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar cartID = msg.req.params.Id;\nvar cartDetails = msg.payload;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.cartID = cartID;\nmsg.payload = cartDetails;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 1000,
+        "wires": [
+            [
+                "fe86f64548c5098a"
+            ]
+        ]
+    },
+    {
+        "id": "07d53c131cdfb5ff",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/setShippingAddress/:Id",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 1000,
+        "wires": [
+            [
+                "043777116511946a"
+            ]
+        ]
+    },
+    {
+        "id": "a1c0a12c1cc55f32",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "shippingAddress",
+        "statusCode": "",
+        "headers": {},
+        "x": 830,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "fe86f64548c5098a",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "shippingAddress",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/carts/{{{cartID}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 610,
+        "y": 1000,
+        "wires": [
+            [
+                "a1c0a12c1cc55f32"
+            ]
+        ]
+    },
+    {
+        "id": "137cc306c290a5c7",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get Customer Carts",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 1140,
+        "wires": [
+            [
+                "7056ed298eb8a98c"
+            ]
+        ]
+    },
+    {
+        "id": "6b3385cb828380f3",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/getCartsByCustomer",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 130,
+        "y": 1140,
+        "wires": [
+            [
+                "137cc306c290a5c7"
+            ]
+        ]
+    },
+    {
+        "id": "a23250dfb8479707",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "getCustomerCarts",
+        "statusCode": "",
+        "headers": {},
+        "x": 830,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "7056ed298eb8a98c",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "getCustomerCarts",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/me/carts?",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 630,
+        "y": 1140,
+        "wires": [
+            [
+                "a23250dfb8479707"
+            ]
+        ]
+    },
+    {
+        "id": "338043d94aa3c2ed",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "DeleteCutomerCart",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar cartID = msg.req.params.Id;\nvar version = msg.req.params.version;\n\nvar cartDetails = msg.payload;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.cartID = cartID;\nmsg.version = version;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 1200,
+        "wires": [
+            [
+                "c9fdc49c8be87534"
+            ]
+        ]
+    },
+    {
+        "id": "3461262216d6b506",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/deleteCustomerCart/:Id/:version",
+        "method": "delete",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 1200,
+        "wires": [
+            [
+                "338043d94aa3c2ed"
+            ]
+        ]
+    },
+    {
+        "id": "441779c39e3e65a4",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "CustomerCart",
+        "statusCode": "",
+        "headers": {},
+        "x": 940,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "c9fdc49c8be87534",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "DeleteCustomerCart",
+        "method": "DELETE",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/me/carts/{{{cartID}}}?version={{{version}}} ",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 720,
+        "y": 1200,
+        "wires": [
+            [
+                "441779c39e3e65a4"
+            ]
+        ]
+    },
+    {
+        "id": "0901450d087fb24d",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/getcontent",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 820,
+        "wires": [
+            [
+                "7cfd4ddd825e1c5c"
+            ]
+        ]
+    },
+    {
+        "id": "f016b6818949aab9",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "Response",
+        "statusCode": "",
+        "headers": {},
+        "x": 740,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "dd7f5759c3d0fc19",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "Strapi",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://3.6.212.112:1337/api/stores?populate=%2A",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "bearer",
+        "senderr": false,
+        "headers": [],
+        "x": 370,
+        "y": 840,
+        "wires": [
+            [
+                "d305ba7ba3b4884b"
+            ]
+        ]
+    },
+    {
+        "id": "d305ba7ba3b4884b",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Strapi",
+        "func": "var title1 = msg.payload.data[0].attributes.name;\n\nnode.warn(\"title1  \" + title1);\n\nvar title2 = msg.payload.data[1].attributes.name;\n\nnode.warn(\"title2  \" + title2);\n\nvar description1 = msg.payload.data[0].attributes.name;\n\nnode.warn(\"description1  \" + description1);\n\nvar description2 = msg.payload.data[1].attributes.name;\n\nnode.warn(\"description2  \" + description2);\n\nvar url3 = msg.payload.data[0].attributes.Banner.data.attributes.formats.large.url;\n\nnode.warn(\"url3  \" + url3);\n\nvar url4 = msg.payload.data[1].attributes.Banner.data.attributes.formats.large.url;\n\nnode.warn(\"url4  \" + url4);\n\nvar baseurl = \"http://3.6.212.112:1337\";\n\nvar url1 = baseurl + url3;\n\nvar url2 = baseurl + url4;\n\nmsg.payload = {\n\n    \"items\": [{ \"title\": title1, \"description\": description1, \"url\": url1 }, { \"title\": title2, \"description\": description2, \"url\": url2 }]\n\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 840,
+        "wires": [
+            [
+                "f016b6818949aab9"
+            ]
+        ]
+    },
+    {
+        "id": "255cdba4d1a61319",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get All Products",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\n\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 1340,
+        "wires": [
+            [
+                "89ea766e98a30234"
+            ]
+        ]
+    },
+    {
+        "id": "932c01fa9cb6edfb",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/getAllProducts",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 90,
+        "y": 1340,
+        "wires": [
+            [
+                "255cdba4d1a61319"
+            ]
+        ]
+    },
+    {
+        "id": "204794bc1b4cd6aa",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "GetAllProducts",
+        "statusCode": "",
+        "headers": {},
+        "x": 760,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "89ea766e98a30234",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "GetAllProducts",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/products?",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 560,
+        "y": 1340,
+        "wires": [
+            [
+                "204794bc1b4cd6aa"
+            ]
+        ]
+    },
+    {
+        "id": "b556c5a061750468",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Create CT product",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar itemDetails = msg.payload;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.payload = itemDetails;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1420,
+        "wires": [
+            [
+                "916713d5c839bdbf"
+            ]
+        ]
+    },
+    {
+        "id": "b1f0cff3ad75a8ca",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/createCTProduct",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 1420,
+        "wires": [
+            [
+                "b556c5a061750468"
+            ]
+        ]
+    },
+    {
+        "id": "19d67c9a8fbceb23",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "createCTProduct",
+        "statusCode": "",
+        "headers": {},
+        "x": 930,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "916713d5c839bdbf",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "createCTProduct",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/products?",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 670,
+        "y": 1420,
+        "wires": [
+            [
+                "19d67c9a8fbceb23"
+            ]
+        ]
+    },
+    {
+        "id": "d88a8daf8ddc6229",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get All Categories",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1500,
+        "wires": [
+            [
+                "aea17b9ab2a0caf3"
+            ]
+        ]
+    },
+    {
+        "id": "7c4fd6236c1e096f",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/getAll-Categories2",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 120,
+        "y": 1500,
+        "wires": [
+            [
+                "d88a8daf8ddc6229"
+            ]
+        ]
+    },
+    {
+        "id": "e0356be7767b0a26",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "GetAllCategories",
+        "statusCode": "",
+        "headers": {},
+        "x": 1010,
+        "y": 1500,
+        "wires": []
+    },
+    {
+        "id": "aea17b9ab2a0caf3",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "GetAllCategories",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/categories",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 570,
+        "y": 1500,
+        "wires": [
+            [
+                "ae7d78d383bed7ba"
+            ]
+        ]
+    },
+    {
+        "id": "ae7d78d383bed7ba",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Respone",
+        "func": "let resPayload = {};\nresPayload.categories = [];\nlet categories = msg.payload.results;\ncategories.forEach((attribute, index) => {\n    let category = {};\n    category.id = attribute.id;\n    category.name = attribute.name.en;\n    resPayload.categories.push(category);\n});\nmsg.payload = resPayload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 1500,
+        "wires": [
+            [
+                "e0356be7767b0a26"
+            ]
+        ]
+    },
+    {
+        "id": "16b4aebe265609c4",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Get All Products",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar limit = msg.req.params.limit;\nvar sort = msg.req.params.sort;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.limit = limit;\nmsg.sort = sort;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 1580,
+        "wires": [
+            [
+                "e5d27c2d6c6cd77e"
+            ]
+        ]
+    },
+    {
+        "id": "8073c3aaec27df65",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/getAllProducts/:limit/:sort",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 170,
+        "y": 1580,
+        "wires": [
+            [
+                "16b4aebe265609c4"
+            ]
+        ]
+    },
+    {
+        "id": "e65bcd40f5f9a490",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "GetAllProducts",
+        "statusCode": "",
+        "headers": {},
+        "x": 800,
+        "y": 1580,
+        "wires": []
+    },
+    {
+        "id": "e5d27c2d6c6cd77e",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "GetAllProducts",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/products?limit={{{limit}}}&sort={{{sort}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 600,
+        "y": 1580,
+        "wires": [
+            [
+                "e65bcd40f5f9a490"
+            ]
+        ]
+    },
+    {
+        "id": "7cfd4ddd825e1c5c",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "Contentfull",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://cdn.contentful.com/spaces/gqlaeh1nu6o2/assets",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "bearer",
+        "senderr": false,
+        "headers": [],
+        "x": 390,
+        "y": 800,
+        "wires": [
+            [
+                "32f9b3e1e09b25a7"
+            ]
+        ]
+    },
+    {
+        "id": "32f9b3e1e09b25a7",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Contentfull",
+        "func": "//const customer_id = msg.req.body.total;\n\nvar title1 = msg.payload.items[0].fields.title;\n\nvar title2 = msg.payload.items[1].fields.title;\n\nnode.warn(\"title----1-----\" + title1);\n\nnode.warn(\"title----2-----\" + title2);\n\nvar description1 = msg.payload.items[0].fields.description;\n\nvar description2 = msg.payload.items[1].fields.description;\n\nvar url1 = msg.payload.items[0].fields.file.url;\n\nvar url2 = msg.payload.items[1].fields.file.url;\n\n\n\n\nmsg.payload = {\n\n    \"items\": [{ \"title\": title1, \"description\": description1, \"url\": url1 }, { \"title\": title2, \"description\": description2, \"url\": url2 }]\n\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 570,
+        "y": 800,
+        "wires": [
+            [
+                "f016b6818949aab9"
+            ]
+        ]
+    },
+    {
+        "id": "dfed2aa7eff51223",
+        "type": "function",
+        "z": "aadd0e98776b9265",
+        "name": "Create Order",
+        "func": "var require = context.global.get('require'); \nvar accessToken = msg.req.headers.accesstoken;\nvar orderDetails = msg.payload;\nmsg.headers = {};\nmsg.headers={ \n    'Authorization':  'Bearer ' + accessToken,\n    'Content-Type': 'application/json'\n};\nmsg.payload = orderDetails;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 1660,
+        "wires": [
+            [
+                "2f79199b7f15cfc9"
+            ]
+        ]
+    },
+    {
+        "id": "d0dd7e86dee104ab",
+        "type": "http in",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "url": "/uc/createOrder",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 100,
+        "y": 1660,
+        "wires": [
+            [
+                "dfed2aa7eff51223"
+            ]
+        ]
+    },
+    {
+        "id": "d8f2322905307db3",
+        "type": "http response",
+        "z": "aadd0e98776b9265",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 730,
+        "y": 1660,
+        "wires": []
+    },
+    {
+        "id": "2f79199b7f15cfc9",
+        "type": "http request",
+        "z": "aadd0e98776b9265",
+        "name": "CreateOrder",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "https://api.australia-southeast1.gcp.commercetools.com/projectsunrise_demo/orders",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 570,
+        "y": 1660,
+        "wires": [
+            [
+                "d8f2322905307db3"
+            ]
+        ]
+    }
+]

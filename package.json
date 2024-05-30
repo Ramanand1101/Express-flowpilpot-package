@@ -1,13 +1,17 @@
 {
   "name": "node-red-plugin-template",
   "version": "1.0.0",
-  "description": "An example plugin that adds a new sidebar to the editor",
+  "description": "This is a composer Toolbar",
   "keywords": [],
   "author": "",
   "license": "Apache-2.0",
   "node-red": {
-      "plugins": {
-          "sidebar-plugin": "sidebar-plugin.html"
-      }
+    "plugins": {
+      "composerTool": "composerTool.html"
+    }
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "jsdom": "^24.1.0"
   }
 }

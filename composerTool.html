@@ -1,0 +1,330 @@
+
+<script type="text/javascript">
+  
+  (function () {
+    const base_URL="http://localhost:3000"
+    // Plugin definition
+    RED.plugins.registerPlugin("example-index-plugin", {
+      onadd: function () {
+        // Create a div element and set its CSS properties
+        var content = $("<div>").css({
+          position: "relative",
+          height: "100%",
+          margin: "5px",
+          borderRadius: "10px",
+          padding: "10px",
+          backgroundColor: "rgb(37, 45, 49)",
+          color: "white",
+          textAlign: "center",
+          paddingTop: "30px",
+          maxWidth: "600px" /* Set maximum width */,
+          marginLeft: "auto" /* Center content horizontally */,
+          marginRight: "auto" /* Center content horizontally */,
+        });
+
+        // Add media query for responsiveness
+        content.css("@media (max-width: 768px)", {
+          padding: "5px",
+          paddingTop: "20px",
+        });
+
+        // Set the class name
+        content.addClass("red-ui-sidebar-index");
+
+        // Function to show alert
+        function showAlert(message) {
+          alert(message);
+        }
+        // Create HTML content for welcome message and tagline
+        content.append(
+          "<h2 style='font-family: Arial, sans-serif; margin-top: 10px; color: rgb(255, 212, 59); margin-bottom: 10px;'>Welcome to UniversalCommerce <br> A New-Generation Toolbar!</h2>"
+        );
+
+        content.append(
+          "<p style='font-size: 16px; '>Your Productivity in your hand.</p>"
+        );
+
+        var parentDiv = $("<div>").css({
+          width: "80%",
+          margin: "auto",
+          borderRadius: "10px",
+          display: "flex",
+          flexDirection: "column",
+          fontSize: "15px",
+          alignItems: "center",
+          border:
+            "2px solid rgba(255, 255, 255, 0.1)" /* Increased transparency for border */,
+          marginTop: "50px",
+          color: "white",
+          boxShadow:
+            "rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px",
+          background:
+            "rgba(255, 255, 255, 0.3)" /* White background with increased transparency */,
+          backdropFilter: "blur(5px)" /* Frosted glass effect */,
+          padding: "20px" /* Padding to contain content */,
+        });
+        // Create three divs for lines of text and buttons
+        var vendureDiv = $("<div>").css({
+          width: "100%",
+          margin: "10px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          alignItems: "center",
+        });
+        var strapiDiv = $("<div>").css({
+          width: "100%",
+          margin: "10px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          alignItems: "center",
+        });
+        var typesenseDiv = $("<div>").css({
+          width: "100%",
+          margin: "10px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          alignItems: "center",
+        });
+
+        // Create three lines of text
+        var vLine = $("<p>")
+          .text("If you want to install Vendure Click here")
+          .css("margin-bottom", "10px");
+        var sLine = $("<p>")
+          .text("If you want to install Strapi Click here")
+          .css("margin-bottom", "10px");
+        var tLine = $("<p>")
+          .text("If you want to install Typesense Click here")
+          .css("margin-bottom", "20px");
+
+        // Append lines of text to their corresponding divs
+        vendureDiv.append(vLine);
+        strapiDiv.append(sLine);
+        typesenseDiv.append(tLine);
+
+        // Create buttons for each line
+        var vendureButton = $("<button>")
+          .css({
+            //width:"50%",
+            marginBottom: "5px",
+            padding: "8px 16px",
+            margin: "5px",
+            backgroundColor: "white",
+            color: "rgb(23, 193, 255)",
+            border: "1px solid black",
+            borderRadius: "4px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center", // Align items in the center
+          })
+          .click(function () {
+            fetch(`${base_URL}/vendureFlow`)
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                return response.json();
+              })
+              .then((data) => {
+                RED.nodes.import(data, function () {
+                  try {
+                    RED.nodes.import(flowData);
+                    showAlert("Vendure flow imported successfully.");
+                  } catch (error) {
+                    showAlert(
+                      "Error importing third predefined flow: " + error.message
+                    );
+                  }
+                });
+                
+                // Here you can process the fetched data as needed
+                console.log("Vendure Flow Imported Successfully",data)
+                showAlert("Vendure flow imported successfully.")
+              })
+              .catch((error) => {
+                console.error(
+                  "There was a problem with the fetch operation:",
+                  error
+                );
+                showAlert(
+                  "Error importing vendure flow : " +
+                    error.message.split(":")[0] +
+                    "!"
+                );
+              });
+          });
+
+        var imgVendure = $("<img>").attr({
+          src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR3irKHdYzhbvPQItDfiR1-A_dutlZST97PIQ&s", // Replace with the URL of the Vendure logo
+          alt: "Vendure Logo",
+          width: "20",
+          height: "20",
+        });
+
+        // Append the image to the button
+        vendureButton.append(imgVendure);
+        vendureButton.append(
+          "<span style='margin-left: 5px;'>Vendure</span>"
+        ); // Append text after the image
+
+        var strapiButton = $("<button>")
+          .css({
+            //width:"50%",
+            marginBottom: "5px",
+            padding: "8px 16px",
+            margin: "5px",
+            backgroundColor: "rgb(76, 37, 217)",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center", // Align items in the center
+          })
+          .click(function () {
+            fetch(`${base_URL}/strapiFlow`)
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                return response.json();
+              })
+              .then((data) => {
+                RED.nodes.import(data, function () {
+                  try {
+                    RED.nodes.import(flowData);
+                    showAlert("Strapi flow imported successfully.");
+                  } catch (error) {
+                    showAlert(
+                      "Error importing third predefined flow: " + error.message
+                    );
+                  }
+                });
+                console.log("Strapi Flow Imported Successfully",data)
+                // Here you can process the fetched data as needed
+                showAlert("Strapi flow imported successfully.")
+                
+              })
+              .catch((error) => {
+                console.error(
+                  "There was a problem with the fetch operation:",
+                  error
+                );
+                showAlert(
+                  "Error importing strapi : " +
+                    error.message.split(":")[0] +
+                    "!"
+                );
+              });
+          });
+
+        var imgStrapi = $("<img>").attr({
+          src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAWlBMVEX///+Odf/Rx//Tyv/VzP/Jv//Y0P+Jb/+Ibf/Pxf+Se/+Lcf+Pdv+wn/+unP/n4v/z8P+CZf/7+v+5q/+Gav++sf/d1//s6P/o5P+zo/+qmP/b0//29f/i2//Xz52TAAADH0lEQVR4nO3c6U7jQBSE0QSbgBmGhMzCOu//moNIgDjeeimJW6X6HsDyUbev7T+9WoG6DNjFDqV7a7O+vorX/S8YsG1u1hH7/QcFvGhjCtf3exAwrPD6LwgYV7gBAaWF70Bl4QEoLDwCdYUfQFnhJ1BV+AUUFbaduPAUKCnsARWFfaCg8AyoJzwHygkHQDXhECgmHAFqCceAUsJRoJJwHCgknADqCKeAMsJJoIpwGiginAFqCOeAEsJZoIJwHiggXADyC5eA9MJFILtwGUguTAByC1OA1MIkILMwDUgsTATyClOBtMJkIKswHUgqzAByCnOAlMJNDpBRmLWCjMJMIJ8wF0gnzAayCfOBZMICIJewBEglLAIyCcuARMJCII+wFEgjLAayCMuBJMK8vwlCYcUKcgirgAzCOiCBsBIYX1gzZCiE1cDownpgcCEAGFuIAIYWQoCRhQ8QYGThVl647yA1tz9QoYWr/eMW0MPTT1DPN1dgIai2QdU+AYlAYQN5nA/PNJAYU4gcW0GFzTNs3EQV3llooYUWWmihhRZaaKGFFlpooYUWWmihhRZaaKGFFlpooYUWWmihhRZaaKGFFlpooYUWWmihhRZaaKGFFlpooYUWWmihhRZaaKGFiNrlGycXvsgLd5gTRAILUYekBBaudrCN2tytb0FBhcAemxZT8/LdlIlQO74LuoIwYVwgSBgYiBF27XczZkIIQwMRwthAgDA4sF4YHVgtDA+sFUZ+TRyrExIA64QMwCohBbBGGH/IvFcuJAGWC1mAxUIaYKmQB1goJAKWCZmARUIqYImQC1ggJAPmC9mA2UI6YK6QD5gpJATmCRmBWUJKYI6QE5ghJAWmC1mByUJaYKqQF5goJAamCZmBSUJqYIqQG5ggJAcuC9mBi0J64JKQH7ggFADOCxWAs0IJ4JxQAzgjFAFOC1WAk0IZ4JRQBzghFAKOC5WAo0Ip4JhQCzgiFAMOhWrAgVAOOBDKAc+FesAzoSCwL1QE9oSSwFOhJvBEKAr8EqoCP4WywA+hLvAoFAYehMrA1etlp/ex3e/13xZ1qf8F19IFdn/xcAAAAABJRU5ErkJggg==", // Replace with the URL of the Strapi logo
+          alt: "Strapi Logo",
+          width: "20",
+          height: "20",
+        });
+
+        // Append the image to the button
+        strapiButton.append(imgStrapi);
+        strapiButton.append(
+          "<span style='margin-left: 5px;'>Strapi</span>"
+        ); // Append text after the image
+
+        var typesenseButton = $("<button>")
+          .css({
+            // width:"60%",
+            marginBottom: "5px",
+            padding: "8px 16px",
+            margin: "5px",
+            backgroundColor: "rgb(211, 3, 101)",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center", // Align items in the center
+          })
+          .click(function () {
+            fetch(`${base_URL}/typesenseFlow`)
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                return response.json();
+              })
+              .then((data) => {
+                RED.nodes.import(data, function () {
+                  try {
+                    RED.nodes.import(flowData);
+                    showAlert("Typesense flow imported successfully.");
+                  } catch (error) {
+                    showAlert(
+                      "Error importing third predefined flow: " + error.message
+                    );
+                  }
+                });
+                // Here you can process the fetched data as needed
+                console.log("Typesense Imported Successfully",data)
+                showAlert("Typesense flow imported successfully.")
+              })
+              .catch((error) => {
+                console.error(
+                  "There was a problem with the fetch operation:",
+                  error
+                );
+                showAlert(
+                  "Error importing typesense flow : " +
+                    error.message.split(":")[0] +
+                    "!"
+                );
+              });
+          });
+
+        var imgTypesense = $("<img>").attr({
+          src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg-NlmyX1y7AQq84sDw7h6DW_PIoZrqeKZLg&s", // Replace with the URL of the Typesense logo
+          alt: "Typesense Logo",
+          width: "20",
+          height: "20",
+        });
+
+        // Append the image to the button
+        typesenseButton.append(imgTypesense);
+        typesenseButton.append(
+          "<span style='margin-left: 5px;'>Typesense</span>"
+        ); // Append text after the image
+
+        // Append buttons to their corresponding divs
+        vendureDiv.append(vendureButton);
+        strapiDiv.append(strapiButton);
+        typesenseDiv.append(typesenseButton);
+        parentDiv.append(vendureDiv, strapiDiv, typesenseDiv);
+        // Append divs to content
+        content.append(parentDiv);
+
+        // Register an action to show the sidebar
+        RED.actions.add("core:show-example-index-tab", function () {
+          try {
+            RED.sidebar.show("example-index");
+            showAlert("Tab shown successfully.");
+          } catch (error) {
+            showAlert("Error showing tab: " + error.message);
+          }
+        });
+
+        // Add the tab to the sidebar
+        RED.sidebar.addTab({
+          id: "example-index",
+          name: "FlowPilot", // long name for the menu
+          label: "FlowPilot", // short name for the tab
+          iconClass: "red-ui-tab-icon fa fa-cogs", // pick from https://fontawesome.com/v4.7.0/icons/
+          content: content,
+          action: "core:show-example-index-tab",
+        });
+      },
+    });
+  })();
+</script>

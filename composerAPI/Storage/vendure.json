@@ -1,0 +1,50 @@
+ [
+    {
+        "id": "12345",
+        "type": "tab",
+        "label": "Vendure Flow"
+    },
+    {
+        "id": "n1", 
+        "type": "inject", 
+        "z": "12345", 
+        "name": "Start Vendure", 
+        "topic": "", 
+        "payload": "", 
+        "payloadType": "date", 
+        "repeat": "", 
+        "crontab": "", 
+        "once": true, 
+        "onceDelay": 0.1, 
+        "x": 150, 
+        "y": 100, 
+        "wires": [["n2"]]
+    },
+    {
+        "id": "n2", 
+        "type": "function", 
+        "z": "12345", 
+        "name": "Generate Random Number", 
+        "func": "msg.payload = Math.floor(Math.random() * 100);\nreturn msg;", 
+        "outputs": 1, 
+        "noerr": 0, 
+        "x": 350, 
+        "y": 100, 
+        "wires": [["n3"]]
+    },
+    {
+        "id": "n3", 
+        "type": "debug", 
+        "z": "12345", 
+        "name": "Debug Vendure", 
+        "active": true, 
+        "tosidebar": true, 
+        "console": false, 
+        "tostatus": false, 
+        "complete": "false", 
+        "targetType": "msg", 
+        "x": 550, 
+        "y": 100, 
+        "wires": []
+    }
+]
