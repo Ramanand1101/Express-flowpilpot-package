@@ -77,7 +77,7 @@ Uploaded files are stored in the `Storage` directory relative to the project roo
 
 ### Contributors
 
-- [Ramanand Tiwari] - Role
+- Ramanand Tiwari
 
 ### License
 
