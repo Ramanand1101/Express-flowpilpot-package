@@ -91,14 +91,27 @@
 
         // Create three lines of text
         var vLine = $("<p>")
-          .text("If you want to install Vendure Click here")
-          .css("margin-bottom", "10px");
+          .text("Import Commerce Flow ")
+          .css({
+              "margin-bottom": "20px",
+              "font-weight": "bold",
+              "font-size": "16px" // Adjust font size as needed
+          });
         var sLine = $("<p>")
-          .text("If you want to install Strapi Click here")
-          .css("margin-bottom", "10px");
+          .text("Import CMS Flow ")
+          .css({
+              "margin-bottom": "20px",
+              "font-weight": "bold",
+              "font-size": "16px" // Adjust font size as needed
+          });
         var tLine = $("<p>")
-          .text("If you want to install Typesense Click here")
-          .css("margin-bottom", "20px");
+          .text("Import Search Flow ")
+          .css({
+              "margin-bottom": "20px",
+              "font-weight": "bold",
+              "font-size": "16px" // Adjust font size as needed
+          });
+
 
         // Append lines of text to their corresponding divs
         vendureDiv.append(vLine);
