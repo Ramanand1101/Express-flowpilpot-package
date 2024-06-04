@@ -52,6 +52,7 @@ app.post("/upload", upload.any(), (req, res) => {
 // Define routes to fetch JSON data for Vendure, Strapi, and Typesense
 app.get('/vendureFlow', (req, res) => {
     fetchData('vendure', res);
+    //fetchData of vendure
     
 });
 
